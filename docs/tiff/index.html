@@ -1,0 +1,132 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `tiff` crate."><meta name="keywords" content="rust, rustlang, rust-lang, tiff"><title>tiff - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Crate tiff</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'tiff', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='in-band'>Crate <a class="mod" href=''>tiff</a></span><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/tiff/lib.rs.html#1-1069' title='goto source code'>[src]</a></span></h1><div class='docblock'><p>A crate for encoding TIFF files. Work in progress.</p>
+</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="mod" href="tiff_type/index.html"
+                                  title='mod tiff::tiff_type'>tiff_type</a></td>
+                           <td class='docblock-short'>
+                                <p>Representations of TIFF field data types.</p>
+
+                           </td>
+                       </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.ByteBlock.html"
+                                  title='struct tiff::ByteBlock'>ByteBlock</a></td>
+                           <td class='docblock-short'>
+                                <p><a href="trait.Datablock"><code>Datablock</code></a> that consists of a list of bytes.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Cursor.html"
+                                  title='struct tiff::Cursor'>Cursor</a></td>
+                           <td class='docblock-short'>
+                                <p>Used during the Allocation Phase of the <code>TiffFile</code> writting.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.EndianFile.html"
+                                  title='struct tiff::EndianFile'>EndianFile</a></td>
+                           <td class='docblock-short'>
+                                <p>A helper structure that provides convenience methods to write to
+a <code>fs::File</code>, being aware of the file's <a href="enum.Endianness.html"><code>Endianness</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Ifd.html"
+                                  title='struct tiff::Ifd'>Ifd</a></td>
+                           <td class='docblock-short'>
+                                <p>A structure that holds both an IFD and all the values pointed at
+by its entries.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.IfdChain.html"
+                                  title='struct tiff::IfdChain'>IfdChain</a></td>
+                           <td class='docblock-short'>
+                                <p>An ordered list of [<code>Ifd</code>]s, each pointing to the next one.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Offsets.html"
+                                  title='struct tiff::Offsets'>Offsets</a></td>
+                           <td class='docblock-short'>
+                                <p>Represents a list of <a href="tiff_types/struct.LONG.html"><code>LONG</code></a> values, each pointing to a specific
+<a href="trait.Datablock.html"><code>Datablock</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.TiffFile.html"
+                                  title='struct tiff::TiffFile'>TiffFile</a></td>
+                           <td class='docblock-short'>
+                                <p>Representation of a Tagged Image File.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.TiffTypeValues.html"
+                                  title='struct tiff::TiffTypeValues'>TiffTypeValues</a></td>
+                           <td class='docblock-short'>
+                                <p>Represents a list of values of any given [<code>TiffType</code>].</p>
+
+                           </td>
+                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Endianness.html"
+                                  title='enum tiff::Endianness'>Endianness</a></td>
+                           <td class='docblock-short'>
+                                <p>The byte order used within the TIFF file.</p>
+
+                           </td>
+                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AllocatedDatablock.html"
+                                  title='trait tiff::AllocatedDatablock'>AllocatedDatablock</a></td>
+                           <td class='docblock-short'>
+                                <p>Represents a <a href="trait.Datablock"><code>Datablock</code></a> that already called <a href="trait.Datablock#method.allocate"><code>allocate(self, &amp;mut Cursor)</code></a>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Datablock.html"
+                                  title='trait tiff::Datablock'>Datablock</a></td>
+                           <td class='docblock-short'>
+                                <p>Represents a block of data in the file pointed to by a field value, but
+that isn't part of the field itself.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.FieldValues.html"
+                                  title='trait tiff::FieldValues'>FieldValues</a></td>
+                           <td class='docblock-short'>
+                                <p>The values contained or pointed at by an IFD Field.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.SimpleDatablock.html"
+                                  title='trait tiff::SimpleDatablock'>SimpleDatablock</a></td>
+                           <td class='docblock-short'>
+                                <p>A trait that conveniently implements automatically <a href="trait.Datablock"><code>Datablock</code></a> and
+<a href="trait.AllocatedDatablock"><code>AllocatedDatablock</code></a>.</p>
+
+                           </td>
+                       </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="type" href="type.FieldTag.html"
+                                  title='type tiff::FieldTag'>FieldTag</a></td>
+                           <td class='docblock-short'>
+                                <p>16-bit identifier of a field entry.</p>
+
+                           </td>
+                       </tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../";window.currentCrate = "tiff";</script><script src="../aliases.js"></script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>
