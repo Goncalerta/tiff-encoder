@@ -24,9 +24,10 @@ pub trait TiffType {
     
     /// The function that writes this type to a given [`EndianFile`].
     /// 
-    /// Be careful, always write the exact same number of bytes
-    /// specified in [`size()`], otherwise the whole file will
-    /// break.
+    /// # Panics
+    /// 
+    /// Will panic if the number of bytes written to the file is
+    /// different than the number of bytes specified in [`size()`].
     /// 
     /// [`EndianFile`]: struct.EndianFile.html
     /// [`size()`]: #tymethod.size
@@ -86,6 +87,7 @@ impl ASCII {
         }
         if *values.last().unwrap() != 0 {
             // TIFF ASCIIs must end with a NUL character.
+            // If the user doesn't add it, add it automatically.
             values.push(0);
         }
         TiffTypeValues::new(values.into_iter().map(|value| ASCII::new(value)).collect())

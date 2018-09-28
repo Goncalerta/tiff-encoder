@@ -46,15 +46,18 @@ impl Endianness {
 pub struct EndianFile {
     file: fs::File,
     byte_order: Endianness,
+    written_bytes: u32,
 }
 impl EndianFile {
     /// Writes a u8 to the file.
-    fn write_u8(&mut self, n: u8) -> io::Result<()> {
+    pub fn write_u8(&mut self, n: u8) -> io::Result<()> {
+        self.written_bytes += 1;
         self.file.write_u8(n)
     }
 
     /// Writes a u16 to the file.
-    fn write_u16(&mut self, n: u16) -> io::Result<()> {
+    pub fn write_u16(&mut self, n: u16) -> io::Result<()> {
+        self.written_bytes += 2;
         match self.byte_order {
             Endianness::II => {
                 self.file.write_u16::<LittleEndian>(n)?;
@@ -67,7 +70,8 @@ impl EndianFile {
     }
 
     /// Writes a u32 to the file.
-    fn write_u32(&mut self, n: u32) -> io::Result<()> {
+    pub fn write_u32(&mut self, n: u32) -> io::Result<()> {
+        self.written_bytes += 4;
         match self.byte_order {
             Endianness::II => {
                 self.file.write_u32::<LittleEndian>(n)?;
@@ -80,12 +84,14 @@ impl EndianFile {
     }
 
     /// Writes a i8 to the file.
-    fn write_i8(&mut self, n: i8) -> io::Result<()> {
+    pub fn write_i8(&mut self, n: i8) -> io::Result<()> {
+        self.written_bytes += 1;
         self.file.write_i8(n)
     }
 
     /// Writes a i16 to the file.
-    fn write_i16(&mut self, n: i16) -> io::Result<()> {
+    pub fn write_i16(&mut self, n: i16) -> io::Result<()> {
+        self.written_bytes += 2;
         match self.byte_order {
             Endianness::II => {
                 self.file.write_i16::<LittleEndian>(n)?;
@@ -98,7 +104,8 @@ impl EndianFile {
     }
 
     /// Writes a i32 to the file.
-    fn write_i32(&mut self, n: i32) -> io::Result<()> {
+    pub fn write_i32(&mut self, n: i32) -> io::Result<()> {
+        self.written_bytes += 4;
         match self.byte_order {
             Endianness::II => {
                 self.file.write_i32::<LittleEndian>(n)?;
@@ -111,7 +118,8 @@ impl EndianFile {
     }
 
     /// Writes a f32 to the file.
-    fn write_f32(&mut self, n: f32) -> io::Result<()> {
+    pub fn write_f32(&mut self, n: f32) -> io::Result<()> {
+        self.written_bytes += 4;
         match self.byte_order {
             Endianness::II => {
                 self.file.write_f32::<LittleEndian>(n)?;
@@ -124,7 +132,8 @@ impl EndianFile {
     }
 
     /// Writes a f64 to the file.
-    fn write_f64(&mut self, n: f64) -> io::Result<()> {
+    pub fn write_f64(&mut self, n: f64) -> io::Result<()> {
+        self.written_bytes += 8;
         match self.byte_order {
             Endianness::II => {
                 self.file.write_f64::<LittleEndian>(n)?;
@@ -141,8 +150,14 @@ impl EndianFile {
     /// This is useful when there is need to write an extra byte
     /// to guarantee that all offsets are even but that byte
     /// doesn't hold any information.
-    fn write_arbitrary_byte(&mut self) -> io::Result<()> {
+    pub fn write_arbitrary_byte(&mut self) -> io::Result<()> {
+        self.written_bytes += 1;
         self.file.write_u8(0)
+    }
+
+    /// Gets the number of written bytes to this file.
+    fn written_bytes(&mut self) -> u32 {
+        self.written_bytes
     }
 }
 
@@ -292,6 +307,7 @@ impl TiffFile {
         let file = EndianFile {
             file,
             byte_order: header.byte_order,
+            written_bytes: 0,
         };
         
         AllocatedTiffFile {
@@ -415,16 +431,7 @@ impl Datablock for IfdChain {
             ifds.push(ifd.allocate(c, index+1 == len));
         }
         AllocatedIfdChain(ifds)
-    }
-
-    /// Returns the size of this IfdChain, that is,
-    /// 
-    /// the sum of the sizes of all the `IFD`s it contains. 
-    #[doc(hidden)]
-    fn size(&self) -> u32 {
-        self.0.iter().map(|ifd| ifd.size()).sum()
-    }
-      
+    } 
 }
 //// An `IfdChain` that called `allocate(&mut Cursor)` and is
 /// ready to write to a file.
@@ -434,9 +441,9 @@ impl AllocatedDatablock for AllocatedIfdChain {
     /// Returns the size of this IfdChain, that is,
     /// 
     /// the sum of the sizes of all the `IFD`s it contains. 
-    fn size(&self) -> u32 {
-        self.0.iter().map(|ifd| ifd.size()).sum()
-    }
+    // fn size(&self) -> u32 {
+    //     self.0.iter().map(|ifd| ifd.size()).sum()
+    // }
 
     /// Write all of the `IFD`s in this chain to the given `EndianFile`.
     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
@@ -560,14 +567,6 @@ struct AllocatedIfd {
 }
 
 impl AllocatedIfd {
-    /// Returns the number of bytes occupied by this `Ifd` in its binary form.
-    /// 
-    /// Note that this only includes the IFD itself, not the values associated
-    /// with it that don't fit in their entry.
-    fn size(&self) -> u32 {
-        self.entries.len() as u32 * 12 + 6
-    }
-
     /// Write this IFD to the given `EndianFile`, as well as any values
     /// associated with its entries.
     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
@@ -685,14 +684,9 @@ pub trait AllocatedFieldValues {
 /// In most cases, it is simpler to implement [`SimpleDatablock`] instead,
 /// which will automatically implement both `Datablock` and its allocated form,
 /// [`AllocatedDatablock`]. Implementing `Datablock` directly is only useful
-/// if there is need to track the position of the block in the file (in order
-/// to write offsets, for example).
-/// 
-/// # Important
-/// 
-/// Be careful to respect all the rules specified in each of its methods when
-/// implementing `Datablock`. A poor implementation that does not respect those
-/// rules may compromise the whole resulting TIFF file, making it invalid.
+/// if there is need to do any special operation during the allocation (for
+/// example, to track the position of the block in the file in order to write
+/// offsets).
 /// 
 /// [`SimpleDatablock`]: trait.SimpleDatablock
 /// [`AllocatedDatablock`]: trait.AllocatedDatablock
@@ -702,82 +696,46 @@ pub trait Datablock {
     /// It is valid for a structure to be both its normal and allocated form,
     /// as long as it doens't need to store any different information after
     /// allocation. In that case, `type Allocated = Self`.
+    /// 
+    /// However, if you find yourself doing that, consider using [`SimpleDataBlock`]
+    /// instead .
+    /// 
+    /// [`SimpleDatablock`]: trait.SimpleDatablock
     type Allocated: AllocatedDatablock;
 
-    /// The number of bytes occupied by this `Datablock`.
-    /// 
-    /// # Important
-    /// 
-    /// This value must not change between the allocation and writing to 
-    /// the file. The number of allocated bytes to the [`Cursor`] in 
-    /// [`allocate(self, &mut Cursor)`] and the number of written bytes 
-    /// to the [`EndianFile`] in [`write_to(self, &mut EndianFile)`] must
-    /// be the same value returned by this function.
-    /// 
-    /// Failing to meet the specifications in the previous paragraph may
-    /// result in the whole resulting TIFF file becoming invalid.
-    /// 
-    /// [`Cursor`]: struct.Cursor.html
-    /// [`EndianFile`]: struct.EndianFile.html
-    /// [`allocate(self, &mut Cursor)`]: #method.allocate
-    /// [`write_to(self, &mut EndianFile)`]: trait.AllocatedDatablock.html#method.write_to
-    fn size(&self) -> u32;
-
     /// Allocates this `Datablock`, moving the [`Cursor`] forwards exactly
-    /// the same number of bytes as returned by [`size(&self)`]. Returns its
-    /// allocated form, [`Self::Allocated`].
+    /// the same number of bytes as those that will be written in 
+    /// [`write_to(self, &mut EndianFile)`]. Returns its allocated form, [`Self::Allocated`].
     /// 
-    /// # Important
+    /// # Panics
     /// 
-    /// Failing to allocate the exact same number of bytes as indicated in
-    /// [`size(&self)`] may compromise the whole TIFF file.
+    /// Failing to allocate the exact same number of bytes that will be written
+    /// to the file will `panic`.
     /// 
+    /// [`write_to(self, &mut EndianFile)`]: trait.AllocatedDatablock.html#method.write_to
     /// [`Cursor`]: struct.Cursor.html
-    /// [`size(&self)`]: #method.size
     /// [`Self::Allocated`]: #associatedtype.Allocated
     fn allocate(self, c: &mut Cursor) -> Self::Allocated;
 }
 
 /// Represents a [`Datablock`] that already called [`allocate(self, &mut Cursor)`].
 /// 
-/// # Important
-/// 
-/// Be careful to respect all the rules specified in each of its methods when
-/// implementing `AllocatedDatablock`. A poor implementation that does not respect 
-/// those rules may compromise the whole resulting TIFF file, making it invalid.
-/// 
 /// [`Datablock`]: trait.Datablock
 /// [`allocate(self, &mut Cursor)`]: trait.Datablock#method.allocate
 pub trait AllocatedDatablock {
-    /// The number of bytes occupied by this `AllocatedDatablock`.
-    /// 
-    /// # Important
-    /// 
-    /// This value must not change between the allocation and writing to 
-    /// the file. The number of allocated bytes to the [`Cursor`] in 
-    /// [`allocate(self, &mut Cursor)`] and the number of written bytes 
-    /// to the [`EndianFile`] in [`write_to(self, &mut EndianFile)`] must
-    /// be the same value returned by this function.
-    /// 
-    /// Failing to meet the specifications in the previous paragraph may
-    /// result in the whole resulting TIFF file becoming invalid.
-    /// 
-    /// [`Cursor`]: struct.Cursor.html
-    /// [`EndianFile`]: struct.EndianFile.html
-    /// [`allocate(self, &mut Cursor)`]: trait.Datablock.html#method.allocate
-    /// [`write_to(self, &mut EndianFile)`]: #method.write_to
-    fn size(&self) -> u32;
 
     /// Writes this `AllocatedDatablock` to an [`EndianFile`]. The number
-    /// of bytes written must be exactly same number as returned by [`size(&self)`].
+    /// of bytes written must be exactly same number as allocated in 
+    /// [`allocate(self, &mut Cursor)`].
     /// 
-    /// # Important
+    /// # Panics
     /// 
-    /// Failing to write the exact same number of bytes as indicated in
-    /// [`size(&self)`] may compromise the whole TIFF file.
+    /// Failing to write the exact same number of bytes as allocated will
+    /// `panic`.
     /// 
     /// [`EndianFile`]: struct.EndianFile.html
     /// [`size(&self)`]: #method.size
+    /// [`allocate(self, &mut Cursor)`]: trait.Datablock.html#method.allocate
     fn write_to(self, file: &mut EndianFile) -> io::Result<()>;
 }
 
@@ -788,25 +746,18 @@ pub trait AllocatedDatablock {
 /// its position in the file. In those cases, implementing this trait is
 /// preferable in relation to directly implementing the two mentioned earlier.
 /// 
-/// # Important
-/// 
-/// Be careful to respect all the rules specified in each of its methods when
-/// implementing `Datablock`. A poor implementation that does not respect those
-/// rules may compromise the whole resulting TIFF file, making it invalid.
-/// 
 /// [`Datablock`]: trait.Datablock
 /// [`AllocatedDatablock`]: trait.AllocatedDatablock
 pub trait SimpleDatablock {
     /// The number of bytes occupied by this `Datablock`.
     /// 
-    /// # Important
+    /// # Panics
     /// 
     /// The number of written bytes to the [`EndianFile`] in 
     /// [`write_to(self, &mut EndianFile)`] must be the same value returned 
     /// by this function.
     /// 
-    /// Failing to meet that specification may result in the whole resulting 
-    /// TIFF file becoming invalid.
+    /// Failing to meet that specification will `panic`.
     /// 
     /// [`EndianFile`]; struct.EndianFile.html
     /// [`write_to(self, &mut EndianFile)`]: #method.write_to
@@ -815,10 +766,10 @@ pub trait SimpleDatablock {
     /// Writes this `Datablock` to an [`EndianFile`]. The number of bytes 
     /// written must be exactly same number as returned by [`size(&self)`].
     /// 
-    /// # Important
+    /// # Panics
     /// 
     /// Failing to write the exact same number of bytes as indicated in
-    /// [`size(&self)`] may compromise the whole TIFF file.
+    /// [`size(&self)`] will `panic`.
     /// 
     /// [`EndianFile`]: struct.EndianFile.html
     /// [`size(&self)`]: #method.size
@@ -826,18 +777,12 @@ pub trait SimpleDatablock {
 }
 impl<T: SimpleDatablock> Datablock for T {
     type Allocated = Self;
-    fn size(&self) -> u32 {
-        SimpleDatablock::size(self)
-    }
     fn allocate(self, c: &mut Cursor) -> Self::Allocated {
         c.allocate(SimpleDatablock::size(&self));
         self
     }
 }
 impl<T: SimpleDatablock> AllocatedDatablock for T {
-    fn size(&self) -> u32 {
-        SimpleDatablock::size(self)
-    }
     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
         SimpleDatablock::write_to(self, file)
     }
@@ -864,6 +809,19 @@ impl<T: Datablock + 'static> Offsets<T> {
             data: datablocks,
         }
     }
+
+    /// Allocates a block and returns it with the number of bytes it allocated.
+    fn allocate_block(block: T, c: &mut Cursor) -> (<T as Datablock>::Allocated, u32)  {
+        let cursor_initial = c.allocated_bytes();
+        let allocated_block = block.allocate(c);
+        let allocated_size = c.allocated_bytes() - cursor_initial;
+        // Internally allocate an extra byte if size is odd.
+        // This guarantes that the next element will
+        // begin on a word-boundary.
+        if allocated_size%2 == 1 { c.allocate(1); }
+
+        (allocated_block, allocated_size)
+    }
 }
 impl<T: Datablock + 'static> FieldValues for Offsets<T> {
     fn count(&self) -> u32 {
@@ -881,33 +839,39 @@ impl<T: Datablock + 'static> FieldValues for Offsets<T> {
             // As such, the offsets vector will be kept empty.
             let offsets = Vec::new();
             let block = self.data.into_iter().next().unwrap(); // Data has size of 1
-            let block_has_odd_size = block.size()%2 == 1;
-            let allocated_data = vec![block.allocate(c)];
-            if block_has_odd_size { c.allocate(1) }
+            let (allocated_block, allocated_size) = Self::allocate_block(block, c);
+            let allocated_data = vec![allocated_block];
+            let allocated_bytes = vec![allocated_size];
+            
             Box::new(AllocatedOffsets {
                 position,
                 offsets,
                 data: allocated_data,
+                sizes: allocated_bytes
             })
         } else {
             c.allocate(self.size());
             let mut offsets = Vec::with_capacity(self.data.len());
             let mut allocated_data = Vec::with_capacity(self.data.len());
+            let mut allocated_bytes = Vec::with_capacity(self.data.len());
 
             for block in self.data {
                 offsets.push(LONG(c.allocated_bytes()));
-                let block_has_odd_size = block.size()%2 == 1;
-                allocated_data.push(block.allocate(c));
-                if block_has_odd_size { c.allocate(1) }
+                let (allocated_block, allocated_size) = Self::allocate_block(block, c);
+                allocated_data.push(allocated_block);
+                allocated_bytes.push(allocated_size);
             }
 
             Box::new(AllocatedOffsets {
                 position,
                 offsets,
                 data: allocated_data,
+                sizes: allocated_bytes,
             })
         }
     }
+
+    
 }
 
 /// Allocated form of `Offsets`
@@ -915,6 +879,11 @@ struct AllocatedOffsets<T: AllocatedDatablock> {
     position: Option<u32>,
     offsets: Vec<LONG>,
     data: Vec<T>,
+    /// The sizes of the Datablocks.
+    /// 
+    /// Used to ensure the allocated bytes are the same number as 
+    /// the written bytes to the file.
+    sizes: Vec<u32>,
 }
 impl<T: AllocatedDatablock> AllocatedFieldValues for AllocatedOffsets<T> {
     fn count(&self) -> u32 {
@@ -935,14 +904,24 @@ impl<T: AllocatedDatablock> AllocatedFieldValues for AllocatedOffsets<T> {
 
     fn write_to(self: Box<Self>, file: &mut EndianFile) -> io::Result<()> {
         let unboxed = *self;
-        let Self { data, offsets,..} = unboxed;
+        let Self { data, offsets, sizes, ..} = unboxed;
         for offset in offsets {
             offset.write_to(file)?;
         }
-        for block in data {
-            let block_has_odd_size = block.size()%2 == 1;
+        for (block, size) in data.into_iter().zip(sizes) {
+            let file_initial = file.written_bytes();
             block.write_to(file)?;
-            if block_has_odd_size { file.write_arbitrary_byte()? }
+            let mut written_size = file.written_bytes - file_initial;
+            // Internally write an extra byte if size is odd.
+            // This guarantes that the next element will
+            // begin on a word-boundary.
+            if written_size%2 == 1 { file.write_arbitrary_byte()? }
+            if written_size != size {
+                panic!(
+                    "The number of bytes allocated by the Datablock ({}) is different from the number of bytes written to the file ({}).", 
+                    size, written_size
+                )
+            }
         }
         
         Ok(())
@@ -1048,7 +1027,15 @@ impl<T: TiffType> AllocatedFieldValues for AllocatedTiffTypeValues<T> {
     fn write_to(self: Box<Self>, file: &mut EndianFile) -> io::Result<()> {
         let size = self.size();
         for value in self.values {
+            let file_initial = file.written_bytes();
             value.write_to(file)?;
+            let mut written_size = file.written_bytes - file_initial;
+            if written_size != T::size() {
+                panic!(
+                    "The size indicated ({}) is different from the number of bytes the type has written to the file ({}).", 
+                    T::size(), written_size
+                )
+            }
         }
        
         if size%2 == 1 && size > 4 {
