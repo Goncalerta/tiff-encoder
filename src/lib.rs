@@ -830,7 +830,7 @@ impl<T: SimpleDatablock> Datablock for T {
         SimpleDatablock::size(self)
     }
     fn allocate(self, c: &mut Cursor) -> Self::Allocated {
-        c.allocate(self.size());
+        c.allocate(SimpleDatablock::size(&self));
         self
     }
 }
@@ -952,7 +952,7 @@ impl<T: AllocatedDatablock> AllocatedFieldValues for AllocatedOffsets<T> {
 /// [`Datablock`] that consists of a list of bytes.
 /// 
 /// [`Datablock`]: trait.Datablock
-pub struct ByteBlock(Vec<u8>);
+pub struct ByteBlock(pub Vec<u8>);
 impl ByteBlock {
     /// Constructs an [`Offsets`] of `ByteBlock`s from a vector of
     /// vectors of bytes.
@@ -964,26 +964,11 @@ impl ByteBlock {
         Offsets::new(blocks.into_iter().map(|block| ByteBlock(block)).collect())
     }
 }
-impl Datablock for ByteBlock {
-    #[doc(hidden)]
-    type Allocated = AllocatedByteBlock;
+impl SimpleDatablock for ByteBlock {
+    fn size(&self) -> u32 {
+        self.0.len() as u32
+    }
     
-    #[doc(hidden)]
-    fn size(&self) -> u32 {
-        self.0.len() as u32
-    }
-    #[doc(hidden)]
-    fn allocate(self, c: &mut Cursor) -> Self::Allocated {
-        c.allocate(self.size());
-        AllocatedByteBlock(self.0)
-    }
-}
-#[doc(hidden)]
-pub struct AllocatedByteBlock(Vec<u8>);
-impl AllocatedDatablock for AllocatedByteBlock {
-    fn size(&self) -> u32 {
-        self.0.len() as u32
-    }
     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
         for byte in self.0 {
             file.write_u8(byte)?;
@@ -991,6 +976,7 @@ impl AllocatedDatablock for AllocatedByteBlock {
         Ok(())
     }
 }
+
 /// Represents a list of values of any given [`TiffType`].
 /// 
 /// [`TiffType`] tiff_type/trait.TiffType.html
