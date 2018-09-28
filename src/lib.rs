@@ -985,6 +985,9 @@ pub struct TiffTypeValues<T: TiffType> {
 }
 impl<T: TiffType + 'static> TiffTypeValues<T> {
     pub fn new(values: Vec<T>) -> Self {
+        if values.len() == 0 {
+            panic!("Cannot create an empty instance of TiffTypeValues")
+        }
         TiffTypeValues {
             values
         }

@@ -38,13 +38,19 @@ pub trait TiffType {
 /// 8-bit unsigned integer.
 pub struct BYTE(pub u8);
 impl BYTE {
-    /// Constructs a [`TiffTypeValues`] of `BYTES`s from a vector of
+    /// Constructs a [`TiffTypeValues`] of `BYTE`s from a vector of
     /// bytes.
     /// 
     /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
     pub fn values(values: Vec<u8>) -> TiffTypeValues<BYTE> {
         TiffTypeValues::new(values.into_iter().map(|value| BYTE(value)).collect())
     }
+    /// Constructs a [`TiffTypeValues`] consisting of a single `BYTE`.
+    /// 
+    /// In other words, marks this byte as the single value of its
+    /// field.
+    /// 
+    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
     pub fn single(value: u8) -> TiffTypeValues<BYTE> {
         TiffTypeValues::new(vec![BYTE(value)])
     }
@@ -61,26 +67,35 @@ impl TiffType for BYTE {
 /// 8-bit byte that contains a 7-bit ASCII code.
 /// 
 /// According the TIFF specification, the last byte 
-/// must be NUL (binary zero, '\0').
-pub struct ASCII(pub u8);
+/// of a field of `ASCII`s must be NUL (binary zero, '\0').
+pub struct ASCII(u8);
 impl ASCII {
     pub fn from_str(s: &str) -> TiffTypeValues<ASCII> {
         let mut values = Vec::with_capacity(s.chars().count());
         for c in s.chars() {
             if c >= (128 as char) {
-                panic!("String contains non-ASCII characters.")
+                panic!("String contains non-ASCII character {}.", c)
             }
             values.push(c as u8);
         }
-        // Push a NUL char at the end of the string.
-        values.push(0);
         Self::values(values)
     }
-    pub fn values(values: Vec<u8>) -> TiffTypeValues<ASCII> {
-        TiffTypeValues::new(values.into_iter().map(|value| ASCII(value)).collect())
+    pub fn values(mut values: Vec<u8>) -> TiffTypeValues<ASCII> {
+        if values.len() == 0 {
+            panic!("Cannot create an empty instance of TiffTypeValues.")
+        }
+        if *values.last().unwrap() != 0 {
+            // TIFF ASCIIs must end with a NUL character.
+            values.push(0);
+        }
+        TiffTypeValues::new(values.into_iter().map(|value| ASCII::new(value)).collect())
     }
-    pub fn single(value: u8) -> TiffTypeValues<ASCII> {
-        TiffTypeValues::new(vec![ASCII(value)])
+    
+    pub fn new(value: u8) -> ASCII {
+        if value >= 128 {
+            panic!("Tried to create an ASCII encoded by the value {}.\n An ASCII value can only range from 0 to 127.", value);
+        }
+        ASCII(value)
     }
 }
 impl TiffType for ASCII {
