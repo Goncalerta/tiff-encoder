@@ -759,7 +759,7 @@ pub trait SimpleDatablock {
     /// 
     /// Failing to meet that specification will `panic`.
     /// 
-    /// [`EndianFile`]; struct.EndianFile.html
+    /// [`EndianFile`]: struct.EndianFile.html
     /// [`write_to(self, &mut EndianFile)`]: #method.write_to
     fn size(&self) -> u32;
 

@@ -1044,19 +1044,6 @@
 <span id="1044">1044</span>
 <span id="1045">1045</span>
 <span id="1046">1046</span>
-<span id="1047">1047</span>
-<span id="1048">1048</span>
-<span id="1049">1049</span>
-<span id="1050">1050</span>
-<span id="1051">1051</span>
-<span id="1052">1052</span>
-<span id="1053">1053</span>
-<span id="1054">1054</span>
-<span id="1055">1055</span>
-<span id="1056">1056</span>
-<span id="1057">1057</span>
-<span id="1058">1058</span>
-<span id="1059">1059</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! A crate for encoding TIFF files. (WIP)</span>
 
@@ -1106,15 +1093,18 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EndianFile</span> {
     <span class="ident">file</span>: <span class="ident">fs</span>::<span class="ident">File</span>,
     <span class="ident">byte_order</span>: <span class="ident">Endianness</span>,
+    <span class="ident">written_bytes</span>: <span class="ident">u32</span>,
 }
 <span class="kw">impl</span> <span class="ident">EndianFile</span> {
     <span class="doccomment">/// Writes a u8 to the file.</span>
-    <span class="kw">fn</span> <span class="ident">write_u8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_u8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">written_bytes</span> <span class="op">+=</span> <span class="number">1</span>;
         <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">write_u8</span>(<span class="ident">n</span>)
     }
 
     <span class="doccomment">/// Writes a u16 to the file.</span>
-    <span class="kw">fn</span> <span class="ident">write_u16</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u16</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_u16</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u16</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">written_bytes</span> <span class="op">+=</span> <span class="number">2</span>;
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">byte_order</span> {
             <span class="ident">Endianness</span>::<span class="ident">II</span> <span class="op">=&gt;</span> {
                 <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">write_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>(<span class="ident">n</span>)<span class="question-mark">?</span>;
@@ -1127,7 +1117,8 @@
     }
 
     <span class="doccomment">/// Writes a u32 to the file.</span>
-    <span class="kw">fn</span> <span class="ident">write_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">written_bytes</span> <span class="op">+=</span> <span class="number">4</span>;
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">byte_order</span> {
             <span class="ident">Endianness</span>::<span class="ident">II</span> <span class="op">=&gt;</span> {
                 <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">write_u32</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>(<span class="ident">n</span>)<span class="question-mark">?</span>;
@@ -1140,12 +1131,14 @@
     }
 
     <span class="doccomment">/// Writes a i8 to the file.</span>
-    <span class="kw">fn</span> <span class="ident">write_i8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i8</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_i8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i8</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">written_bytes</span> <span class="op">+=</span> <span class="number">1</span>;
         <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">write_i8</span>(<span class="ident">n</span>)
     }
 
     <span class="doccomment">/// Writes a i16 to the file.</span>
-    <span class="kw">fn</span> <span class="ident">write_i16</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i16</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_i16</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i16</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">written_bytes</span> <span class="op">+=</span> <span class="number">2</span>;
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">byte_order</span> {
             <span class="ident">Endianness</span>::<span class="ident">II</span> <span class="op">=&gt;</span> {
                 <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">write_i16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>(<span class="ident">n</span>)<span class="question-mark">?</span>;
@@ -1158,7 +1151,8 @@
     }
 
     <span class="doccomment">/// Writes a i32 to the file.</span>
-    <span class="kw">fn</span> <span class="ident">write_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">written_bytes</span> <span class="op">+=</span> <span class="number">4</span>;
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">byte_order</span> {
             <span class="ident">Endianness</span>::<span class="ident">II</span> <span class="op">=&gt;</span> {
                 <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">write_i32</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>(<span class="ident">n</span>)<span class="question-mark">?</span>;
@@ -1171,7 +1165,8 @@
     }
 
     <span class="doccomment">/// Writes a f32 to the file.</span>
-    <span class="kw">fn</span> <span class="ident">write_f32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">f32</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_f32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">f32</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">written_bytes</span> <span class="op">+=</span> <span class="number">4</span>;
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">byte_order</span> {
             <span class="ident">Endianness</span>::<span class="ident">II</span> <span class="op">=&gt;</span> {
                 <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">write_f32</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>(<span class="ident">n</span>)<span class="question-mark">?</span>;
@@ -1184,7 +1179,8 @@
     }
 
     <span class="doccomment">/// Writes a f64 to the file.</span>
-    <span class="kw">fn</span> <span class="ident">write_f64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_f64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">written_bytes</span> <span class="op">+=</span> <span class="number">8</span>;
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">byte_order</span> {
             <span class="ident">Endianness</span>::<span class="ident">II</span> <span class="op">=&gt;</span> {
                 <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">write_f64</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>(<span class="ident">n</span>)<span class="question-mark">?</span>;
@@ -1201,8 +1197,14 @@
     <span class="doccomment">/// This is useful when there is need to write an extra byte</span>
     <span class="doccomment">/// to guarantee that all offsets are even but that byte</span>
     <span class="doccomment">/// doesn&#39;t hold any information.</span>
-    <span class="kw">fn</span> <span class="ident">write_arbitrary_byte</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_arbitrary_byte</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">written_bytes</span> <span class="op">+=</span> <span class="number">1</span>;
         <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">write_u8</span>(<span class="number">0</span>)
+    }
+
+    <span class="doccomment">/// Gets the number of written bytes to this file.</span>
+    <span class="kw">fn</span> <span class="ident">written_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
+        <span class="self">self</span>.<span class="ident">written_bytes</span>
     }
 }
 
@@ -1352,6 +1354,7 @@
         <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">EndianFile</span> {
             <span class="ident">file</span>,
             <span class="ident">byte_order</span>: <span class="ident">header</span>.<span class="ident">byte_order</span>,
+            <span class="ident">written_bytes</span>: <span class="number">0</span>,
         };
         
         <span class="ident">AllocatedTiffFile</span> {
@@ -1475,16 +1478,7 @@
             <span class="ident">ifds</span>.<span class="ident">push</span>(<span class="ident">ifd</span>.<span class="ident">allocate</span>(<span class="ident">c</span>, <span class="ident">index</span><span class="op">+</span><span class="number">1</span> <span class="op">==</span> <span class="ident">len</span>));
         }
         <span class="ident">AllocatedIfdChain</span>(<span class="ident">ifds</span>)
-    }
-
-    <span class="doccomment">/// Returns the size of this IfdChain, that is,</span>
-    <span class="doccomment">/// </span>
-    <span class="doccomment">/// the sum of the sizes of all the `IFD`s it contains. </span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ifd</span><span class="op">|</span> <span class="ident">ifd</span>.<span class="ident">size</span>()).<span class="ident">sum</span>()
-    }
-      
+    } 
 }
 <span class="comment">//// An `IfdChain` that called `allocate(&amp;mut Cursor)` and is</span>
 <span class="doccomment">/// ready to write to a file.</span>
@@ -1494,9 +1488,9 @@
     <span class="doccomment">/// Returns the size of this IfdChain, that is,</span>
     <span class="doccomment">/// </span>
     <span class="doccomment">/// the sum of the sizes of all the `IFD`s it contains. </span>
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ifd</span><span class="op">|</span> <span class="ident">ifd</span>.<span class="ident">size</span>()).<span class="ident">sum</span>()
-    }
+    <span class="comment">// fn size(&amp;self) -&gt; u32 {</span>
+    <span class="comment">//     self.0.iter().map(|ifd| ifd.size()).sum()</span>
+    <span class="comment">// }</span>
 
     <span class="doccomment">/// Write all of the `IFD`s in this chain to the given `EndianFile`.</span>
     <span class="kw">fn</span> <span class="ident">write_to</span>(<span class="self">self</span>, <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianFile</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -1620,14 +1614,6 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AllocatedIfd</span> {
-    <span class="doccomment">/// Returns the number of bytes occupied by this `Ifd` in its binary form.</span>
-    <span class="doccomment">/// </span>
-    <span class="doccomment">/// Note that this only includes the IFD itself, not the values associated</span>
-    <span class="doccomment">/// with it that don&#39;t fit in their entry.</span>
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span> <span class="op">*</span> <span class="number">12</span> <span class="op">+</span> <span class="number">6</span>
-    }
-
     <span class="doccomment">/// Write this IFD to the given `EndianFile`, as well as any values</span>
     <span class="doccomment">/// associated with its entries.</span>
     <span class="kw">fn</span> <span class="ident">write_to</span>(<span class="self">self</span>, <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianFile</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -1745,14 +1731,9 @@
 <span class="doccomment">/// In most cases, it is simpler to implement [`SimpleDatablock`] instead,</span>
 <span class="doccomment">/// which will automatically implement both `Datablock` and its allocated form,</span>
 <span class="doccomment">/// [`AllocatedDatablock`]. Implementing `Datablock` directly is only useful</span>
-<span class="doccomment">/// if there is need to track the position of the block in the file (in order</span>
-<span class="doccomment">/// to write offsets, for example).</span>
-<span class="doccomment">/// </span>
-<span class="doccomment">/// # Important</span>
-<span class="doccomment">/// </span>
-<span class="doccomment">/// Be careful to respect all the rules specified in each of its methods when</span>
-<span class="doccomment">/// implementing `Datablock`. A poor implementation that does not respect those</span>
-<span class="doccomment">/// rules may compromise the whole resulting TIFF file, making it invalid.</span>
+<span class="doccomment">/// if there is need to do any special operation during the allocation (for</span>
+<span class="doccomment">/// example, to track the position of the block in the file in order to write</span>
+<span class="doccomment">/// offsets).</span>
 <span class="doccomment">/// </span>
 <span class="doccomment">/// [`SimpleDatablock`]: trait.SimpleDatablock</span>
 <span class="doccomment">/// [`AllocatedDatablock`]: trait.AllocatedDatablock</span>
@@ -1762,82 +1743,46 @@
     <span class="doccomment">/// It is valid for a structure to be both its normal and allocated form,</span>
     <span class="doccomment">/// as long as it doens&#39;t need to store any different information after</span>
     <span class="doccomment">/// allocation. In that case, `type Allocated = Self`.</span>
+    <span class="doccomment">/// </span>
+    <span class="doccomment">/// However, if you find yourself doing that, consider using [`SimpleDataBlock`]</span>
+    <span class="doccomment">/// instead .</span>
+    <span class="doccomment">/// </span>
+    <span class="doccomment">/// [`SimpleDatablock`]: trait.SimpleDatablock</span>
     <span class="kw">type</span> <span class="ident">Allocated</span>: <span class="ident">AllocatedDatablock</span>;
 
-    <span class="doccomment">/// The number of bytes occupied by this `Datablock`.</span>
-    <span class="doccomment">/// </span>
-    <span class="doccomment">/// # Important</span>
-    <span class="doccomment">/// </span>
-    <span class="doccomment">/// This value must not change between the allocation and writing to </span>
-    <span class="doccomment">/// the file. The number of allocated bytes to the [`Cursor`] in </span>
-    <span class="doccomment">/// [`allocate(self, &amp;mut Cursor)`] and the number of written bytes </span>
-    <span class="doccomment">/// to the [`EndianFile`] in [`write_to(self, &amp;mut EndianFile)`] must</span>
-    <span class="doccomment">/// be the same value returned by this function.</span>
-    <span class="doccomment">/// </span>
-    <span class="doccomment">/// Failing to meet the specifications in the previous paragraph may</span>
-    <span class="doccomment">/// result in the whole resulting TIFF file becoming invalid.</span>
-    <span class="doccomment">/// </span>
-    <span class="doccomment">/// [`Cursor`]: struct.Cursor.html</span>
-    <span class="doccomment">/// [`EndianFile`]: struct.EndianFile.html</span>
-    <span class="doccomment">/// [`allocate(self, &amp;mut Cursor)`]: #method.allocate</span>
-    <span class="doccomment">/// [`write_to(self, &amp;mut EndianFile)`]: trait.AllocatedDatablock.html#method.write_to</span>
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span>;
-
     <span class="doccomment">/// Allocates this `Datablock`, moving the [`Cursor`] forwards exactly</span>
-    <span class="doccomment">/// the same number of bytes as returned by [`size(&amp;self)`]. Returns its</span>
-    <span class="doccomment">/// allocated form, [`Self::Allocated`].</span>
+    <span class="doccomment">/// the same number of bytes as those that will be written in </span>
+    <span class="doccomment">/// [`write_to(self, &amp;mut EndianFile)`]. Returns its allocated form, [`Self::Allocated`].</span>
     <span class="doccomment">/// </span>
-    <span class="doccomment">/// # Important</span>
+    <span class="doccomment">/// # Panics</span>
     <span class="doccomment">/// </span>
-    <span class="doccomment">/// Failing to allocate the exact same number of bytes as indicated in</span>
-    <span class="doccomment">/// [`size(&amp;self)`] may compromise the whole TIFF file.</span>
+    <span class="doccomment">/// Failing to allocate the exact same number of bytes that will be written</span>
+    <span class="doccomment">/// to the file will `panic`.</span>
     <span class="doccomment">/// </span>
+    <span class="doccomment">/// [`write_to(self, &amp;mut EndianFile)`]: trait.AllocatedDatablock.html#method.write_to</span>
     <span class="doccomment">/// [`Cursor`]: struct.Cursor.html</span>
-    <span class="doccomment">/// [`size(&amp;self)`]: #method.size</span>
     <span class="doccomment">/// [`Self::Allocated`]: #associatedtype.Allocated</span>
     <span class="kw">fn</span> <span class="ident">allocate</span>(<span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Cursor</span>) <span class="op">-&gt;</span> <span class="self">Self</span>::<span class="ident">Allocated</span>;
 }
 
 <span class="doccomment">/// Represents a [`Datablock`] that already called [`allocate(self, &amp;mut Cursor)`].</span>
 <span class="doccomment">/// </span>
-<span class="doccomment">/// # Important</span>
-<span class="doccomment">/// </span>
-<span class="doccomment">/// Be careful to respect all the rules specified in each of its methods when</span>
-<span class="doccomment">/// implementing `AllocatedDatablock`. A poor implementation that does not respect </span>
-<span class="doccomment">/// those rules may compromise the whole resulting TIFF file, making it invalid.</span>
-<span class="doccomment">/// </span>
 <span class="doccomment">/// [`Datablock`]: trait.Datablock</span>
 <span class="doccomment">/// [`allocate(self, &amp;mut Cursor)`]: trait.Datablock#method.allocate</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AllocatedDatablock</span> {
-    <span class="doccomment">/// The number of bytes occupied by this `AllocatedDatablock`.</span>
-    <span class="doccomment">/// </span>
-    <span class="doccomment">/// # Important</span>
-    <span class="doccomment">/// </span>
-    <span class="doccomment">/// This value must not change between the allocation and writing to </span>
-    <span class="doccomment">/// the file. The number of allocated bytes to the [`Cursor`] in </span>
-    <span class="doccomment">/// [`allocate(self, &amp;mut Cursor)`] and the number of written bytes </span>
-    <span class="doccomment">/// to the [`EndianFile`] in [`write_to(self, &amp;mut EndianFile)`] must</span>
-    <span class="doccomment">/// be the same value returned by this function.</span>
-    <span class="doccomment">/// </span>
-    <span class="doccomment">/// Failing to meet the specifications in the previous paragraph may</span>
-    <span class="doccomment">/// result in the whole resulting TIFF file becoming invalid.</span>
-    <span class="doccomment">/// </span>
-    <span class="doccomment">/// [`Cursor`]: struct.Cursor.html</span>
-    <span class="doccomment">/// [`EndianFile`]: struct.EndianFile.html</span>
-    <span class="doccomment">/// [`allocate(self, &amp;mut Cursor)`]: trait.Datablock.html#method.allocate</span>
-    <span class="doccomment">/// [`write_to(self, &amp;mut EndianFile)`]: #method.write_to</span>
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span>;
 
     <span class="doccomment">/// Writes this `AllocatedDatablock` to an [`EndianFile`]. The number</span>
-    <span class="doccomment">/// of bytes written must be exactly same number as returned by [`size(&amp;self)`].</span>
+    <span class="doccomment">/// of bytes written must be exactly same number as allocated in </span>
+    <span class="doccomment">/// [`allocate(self, &amp;mut Cursor)`].</span>
     <span class="doccomment">/// </span>
-    <span class="doccomment">/// # Important</span>
+    <span class="doccomment">/// # Panics</span>
     <span class="doccomment">/// </span>
-    <span class="doccomment">/// Failing to write the exact same number of bytes as indicated in</span>
-    <span class="doccomment">/// [`size(&amp;self)`] may compromise the whole TIFF file.</span>
+    <span class="doccomment">/// Failing to write the exact same number of bytes as allocated will</span>
+    <span class="doccomment">/// `panic`.</span>
     <span class="doccomment">/// </span>
     <span class="doccomment">/// [`EndianFile`]: struct.EndianFile.html</span>
     <span class="doccomment">/// [`size(&amp;self)`]: #method.size</span>
+    <span class="doccomment">/// [`allocate(self, &amp;mut Cursor)`]: trait.Datablock.html#method.allocate</span>
     <span class="kw">fn</span> <span class="ident">write_to</span>(<span class="self">self</span>, <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianFile</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 }
 
@@ -1848,37 +1793,30 @@
 <span class="doccomment">/// its position in the file. In those cases, implementing this trait is</span>
 <span class="doccomment">/// preferable in relation to directly implementing the two mentioned earlier.</span>
 <span class="doccomment">/// </span>
-<span class="doccomment">/// # Important</span>
-<span class="doccomment">/// </span>
-<span class="doccomment">/// Be careful to respect all the rules specified in each of its methods when</span>
-<span class="doccomment">/// implementing `Datablock`. A poor implementation that does not respect those</span>
-<span class="doccomment">/// rules may compromise the whole resulting TIFF file, making it invalid.</span>
-<span class="doccomment">/// </span>
 <span class="doccomment">/// [`Datablock`]: trait.Datablock</span>
 <span class="doccomment">/// [`AllocatedDatablock`]: trait.AllocatedDatablock</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SimpleDatablock</span> {
     <span class="doccomment">/// The number of bytes occupied by this `Datablock`.</span>
     <span class="doccomment">/// </span>
-    <span class="doccomment">/// # Important</span>
+    <span class="doccomment">/// # Panics</span>
     <span class="doccomment">/// </span>
     <span class="doccomment">/// The number of written bytes to the [`EndianFile`] in </span>
     <span class="doccomment">/// [`write_to(self, &amp;mut EndianFile)`] must be the same value returned </span>
     <span class="doccomment">/// by this function.</span>
     <span class="doccomment">/// </span>
-    <span class="doccomment">/// Failing to meet that specification may result in the whole resulting </span>
-    <span class="doccomment">/// TIFF file becoming invalid.</span>
+    <span class="doccomment">/// Failing to meet that specification will `panic`.</span>
     <span class="doccomment">/// </span>
-    <span class="doccomment">/// [`EndianFile`]; struct.EndianFile.html</span>
+    <span class="doccomment">/// [`EndianFile`]: struct.EndianFile.html</span>
     <span class="doccomment">/// [`write_to(self, &amp;mut EndianFile)`]: #method.write_to</span>
     <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span>;
 
     <span class="doccomment">/// Writes this `Datablock` to an [`EndianFile`]. The number of bytes </span>
     <span class="doccomment">/// written must be exactly same number as returned by [`size(&amp;self)`].</span>
     <span class="doccomment">/// </span>
-    <span class="doccomment">/// # Important</span>
+    <span class="doccomment">/// # Panics</span>
     <span class="doccomment">/// </span>
     <span class="doccomment">/// Failing to write the exact same number of bytes as indicated in</span>
-    <span class="doccomment">/// [`size(&amp;self)`] may compromise the whole TIFF file.</span>
+    <span class="doccomment">/// [`size(&amp;self)`] will `panic`.</span>
     <span class="doccomment">/// </span>
     <span class="doccomment">/// [`EndianFile`]: struct.EndianFile.html</span>
     <span class="doccomment">/// [`size(&amp;self)`]: #method.size</span>
@@ -1886,18 +1824,12 @@
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">SimpleDatablock</span><span class="op">&gt;</span> <span class="ident">Datablock</span> <span class="kw">for</span> <span class="ident">T</span> {
     <span class="kw">type</span> <span class="ident">Allocated</span> <span class="op">=</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
-        <span class="ident">SimpleDatablock</span>::<span class="ident">size</span>(<span class="self">self</span>)
-    }
     <span class="kw">fn</span> <span class="ident">allocate</span>(<span class="self">self</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Cursor</span>) <span class="op">-&gt;</span> <span class="self">Self</span>::<span class="ident">Allocated</span> {
         <span class="ident">c</span>.<span class="ident">allocate</span>(<span class="ident">SimpleDatablock</span>::<span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>));
         <span class="self">self</span>
     }
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">SimpleDatablock</span><span class="op">&gt;</span> <span class="ident">AllocatedDatablock</span> <span class="kw">for</span> <span class="ident">T</span> {
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
-        <span class="ident">SimpleDatablock</span>::<span class="ident">size</span>(<span class="self">self</span>)
-    }
     <span class="kw">fn</span> <span class="ident">write_to</span>(<span class="self">self</span>, <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianFile</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">SimpleDatablock</span>::<span class="ident">write_to</span>(<span class="self">self</span>, <span class="ident">file</span>)
     }
@@ -1924,6 +1856,19 @@
             <span class="ident">data</span>: <span class="ident">datablocks</span>,
         }
     }
+
+    <span class="doccomment">/// Allocates a block and returns it with the number of bytes it allocated.</span>
+    <span class="kw">fn</span> <span class="ident">allocate_block</span>(<span class="ident">block</span>: <span class="ident">T</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Cursor</span>) <span class="op">-&gt;</span> (<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Datablock</span><span class="op">&gt;</span>::<span class="ident">Allocated</span>, <span class="ident">u32</span>)  {
+        <span class="kw">let</span> <span class="ident">cursor_initial</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">allocated_bytes</span>();
+        <span class="kw">let</span> <span class="ident">allocated_block</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">allocate</span>(<span class="ident">c</span>);
+        <span class="kw">let</span> <span class="ident">allocated_size</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">allocated_bytes</span>() <span class="op">-</span> <span class="ident">cursor_initial</span>;
+        <span class="comment">// Internally allocate an extra byte if size is odd.</span>
+        <span class="comment">// This guarantes that the next element will</span>
+        <span class="comment">// begin on a word-boundary.</span>
+        <span class="kw">if</span> <span class="ident">allocated_size</span><span class="op">%</span><span class="number">2</span> <span class="op">==</span> <span class="number">1</span> { <span class="ident">c</span>.<span class="ident">allocate</span>(<span class="number">1</span>); }
+
+        (<span class="ident">allocated_block</span>, <span class="ident">allocated_size</span>)
+    }
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Datablock</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">FieldValues</span> <span class="kw">for</span> <span class="ident">Offsets</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
@@ -1941,33 +1886,39 @@
             <span class="comment">// As such, the offsets vector will be kept empty.</span>
             <span class="kw">let</span> <span class="ident">offsets</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
             <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(); <span class="comment">// Data has size of 1</span>
-            <span class="kw">let</span> <span class="ident">block_has_odd_size</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">size</span>()<span class="op">%</span><span class="number">2</span> <span class="op">==</span> <span class="number">1</span>;
-            <span class="kw">let</span> <span class="ident">allocated_data</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">block</span>.<span class="ident">allocate</span>(<span class="ident">c</span>)];
-            <span class="kw">if</span> <span class="ident">block_has_odd_size</span> { <span class="ident">c</span>.<span class="ident">allocate</span>(<span class="number">1</span>) }
+            <span class="kw">let</span> (<span class="ident">allocated_block</span>, <span class="ident">allocated_size</span>) <span class="op">=</span> <span class="self">Self</span>::<span class="ident">allocate_block</span>(<span class="ident">block</span>, <span class="ident">c</span>);
+            <span class="kw">let</span> <span class="ident">allocated_data</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">allocated_block</span>];
+            <span class="kw">let</span> <span class="ident">allocated_bytes</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">allocated_size</span>];
+            
             <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">AllocatedOffsets</span> {
                 <span class="ident">position</span>,
                 <span class="ident">offsets</span>,
                 <span class="ident">data</span>: <span class="ident">allocated_data</span>,
+                <span class="ident">sizes</span>: <span class="ident">allocated_bytes</span>
             })
         } <span class="kw">else</span> {
             <span class="ident">c</span>.<span class="ident">allocate</span>(<span class="self">self</span>.<span class="ident">size</span>());
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">offsets</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>());
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">allocated_data</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>());
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">allocated_bytes</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>());
 
             <span class="kw">for</span> <span class="ident">block</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">data</span> {
                 <span class="ident">offsets</span>.<span class="ident">push</span>(<span class="ident">LONG</span>(<span class="ident">c</span>.<span class="ident">allocated_bytes</span>()));
-                <span class="kw">let</span> <span class="ident">block_has_odd_size</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">size</span>()<span class="op">%</span><span class="number">2</span> <span class="op">==</span> <span class="number">1</span>;
-                <span class="ident">allocated_data</span>.<span class="ident">push</span>(<span class="ident">block</span>.<span class="ident">allocate</span>(<span class="ident">c</span>));
-                <span class="kw">if</span> <span class="ident">block_has_odd_size</span> { <span class="ident">c</span>.<span class="ident">allocate</span>(<span class="number">1</span>) }
+                <span class="kw">let</span> (<span class="ident">allocated_block</span>, <span class="ident">allocated_size</span>) <span class="op">=</span> <span class="self">Self</span>::<span class="ident">allocate_block</span>(<span class="ident">block</span>, <span class="ident">c</span>);
+                <span class="ident">allocated_data</span>.<span class="ident">push</span>(<span class="ident">allocated_block</span>);
+                <span class="ident">allocated_bytes</span>.<span class="ident">push</span>(<span class="ident">allocated_size</span>);
             }
 
             <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">AllocatedOffsets</span> {
                 <span class="ident">position</span>,
                 <span class="ident">offsets</span>,
                 <span class="ident">data</span>: <span class="ident">allocated_data</span>,
+                <span class="ident">sizes</span>: <span class="ident">allocated_bytes</span>,
             })
         }
     }
+
+    
 }
 
 <span class="doccomment">/// Allocated form of `Offsets`</span>
@@ -1975,6 +1926,11 @@
     <span class="ident">position</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">offsets</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LONG</span><span class="op">&gt;</span>,
     <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The sizes of the Datablocks.</span>
+    <span class="doccomment">/// </span>
+    <span class="doccomment">/// Used to ensure the allocated bytes are the same number as </span>
+    <span class="doccomment">/// the written bytes to the file.</span>
+    <span class="ident">sizes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AllocatedDatablock</span><span class="op">&gt;</span> <span class="ident">AllocatedFieldValues</span> <span class="kw">for</span> <span class="ident">AllocatedOffsets</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
@@ -1995,14 +1951,24 @@
 
     <span class="kw">fn</span> <span class="ident">write_to</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianFile</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">unboxed</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
-        <span class="kw">let</span> <span class="self">Self</span> { <span class="ident">data</span>, <span class="ident">offsets</span>,..} <span class="op">=</span> <span class="ident">unboxed</span>;
+        <span class="kw">let</span> <span class="self">Self</span> { <span class="ident">data</span>, <span class="ident">offsets</span>, <span class="ident">sizes</span>, ..} <span class="op">=</span> <span class="ident">unboxed</span>;
         <span class="kw">for</span> <span class="ident">offset</span> <span class="kw">in</span> <span class="ident">offsets</span> {
             <span class="ident">offset</span>.<span class="ident">write_to</span>(<span class="ident">file</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">for</span> <span class="ident">block</span> <span class="kw">in</span> <span class="ident">data</span> {
-            <span class="kw">let</span> <span class="ident">block_has_odd_size</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">size</span>()<span class="op">%</span><span class="number">2</span> <span class="op">==</span> <span class="number">1</span>;
+        <span class="kw">for</span> (<span class="ident">block</span>, <span class="ident">size</span>) <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">into_iter</span>().<span class="ident">zip</span>(<span class="ident">sizes</span>) {
+            <span class="kw">let</span> <span class="ident">file_initial</span> <span class="op">=</span> <span class="ident">file</span>.<span class="ident">written_bytes</span>();
             <span class="ident">block</span>.<span class="ident">write_to</span>(<span class="ident">file</span>)<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">block_has_odd_size</span> { <span class="ident">file</span>.<span class="ident">write_arbitrary_byte</span>()<span class="question-mark">?</span> }
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">written_size</span> <span class="op">=</span> <span class="ident">file</span>.<span class="ident">written_bytes</span> <span class="op">-</span> <span class="ident">file_initial</span>;
+            <span class="comment">// Internally write an extra byte if size is odd.</span>
+            <span class="comment">// This guarantes that the next element will</span>
+            <span class="comment">// begin on a word-boundary.</span>
+            <span class="kw">if</span> <span class="ident">written_size</span><span class="op">%</span><span class="number">2</span> <span class="op">==</span> <span class="number">1</span> { <span class="ident">file</span>.<span class="ident">write_arbitrary_byte</span>()<span class="question-mark">?</span> }
+            <span class="kw">if</span> <span class="ident">written_size</span> <span class="op">!=</span> <span class="ident">size</span> {
+                <span class="macro">panic</span><span class="macro">!</span>(
+                    <span class="string">&quot;The number of bytes allocated by the Datablock ({}) is different from the number of bytes written to the file ({}).&quot;</span>, 
+                    <span class="ident">size</span>, <span class="ident">written_size</span>
+                )
+            }
         }
         
         <span class="prelude-val">Ok</span>(())
@@ -2108,7 +2074,15 @@
     <span class="kw">fn</span> <span class="ident">write_to</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianFile</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">size</span>();
         <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">values</span> {
+            <span class="kw">let</span> <span class="ident">file_initial</span> <span class="op">=</span> <span class="ident">file</span>.<span class="ident">written_bytes</span>();
             <span class="ident">value</span>.<span class="ident">write_to</span>(<span class="ident">file</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">written_size</span> <span class="op">=</span> <span class="ident">file</span>.<span class="ident">written_bytes</span> <span class="op">-</span> <span class="ident">file_initial</span>;
+            <span class="kw">if</span> <span class="ident">written_size</span> <span class="op">!=</span> <span class="ident">T</span>::<span class="ident">size</span>() {
+                <span class="macro">panic</span><span class="macro">!</span>(
+                    <span class="string">&quot;The size indicated ({}) is different from the number of bytes the type has written to the file ({}).&quot;</span>, 
+                    <span class="ident">T</span>::<span class="ident">size</span>(), <span class="ident">written_size</span>
+                )
+            }
         }
        
         <span class="kw">if</span> <span class="ident">size</span><span class="op">%</span><span class="number">2</span> <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">size</span> <span class="op">&gt;</span> <span class="number">4</span> {

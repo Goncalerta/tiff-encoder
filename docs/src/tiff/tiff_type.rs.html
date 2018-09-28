@@ -322,6 +322,8 @@
 <span id="322">322</span>
 <span id="323">323</span>
 <span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Representations of TIFF field data types.</span>
 <span class="doccomment">//! </span>
@@ -349,9 +351,10 @@
     
     <span class="doccomment">/// The function that writes this type to a given [`EndianFile`].</span>
     <span class="doccomment">/// </span>
-    <span class="doccomment">/// Be careful, always write the exact same number of bytes</span>
-    <span class="doccomment">/// specified in [`size()`], otherwise the whole file will</span>
-    <span class="doccomment">/// break.</span>
+    <span class="doccomment">/// # Panics</span>
+    <span class="doccomment">/// </span>
+    <span class="doccomment">/// Will panic if the number of bytes written to the file is</span>
+    <span class="doccomment">/// different than the number of bytes specified in [`size()`].</span>
     <span class="doccomment">/// </span>
     <span class="doccomment">/// [`EndianFile`]: struct.EndianFile.html</span>
     <span class="doccomment">/// [`size()`]: #tymethod.size</span>
@@ -411,6 +414,7 @@
         }
         <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">values</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>() <span class="op">!=</span> <span class="number">0</span> {
             <span class="comment">// TIFF ASCIIs must end with a NUL character.</span>
+            <span class="comment">// If the user doesn&#39;t add it, add it automatically.</span>
             <span class="ident">values</span>.<span class="ident">push</span>(<span class="number">0</span>);
         }
         <span class="ident">TiffTypeValues</span>::<span class="ident">new</span>(<span class="ident">values</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">ASCII</span>::<span class="ident">new</span>(<span class="ident">value</span>)).<span class="ident">collect</span>())
