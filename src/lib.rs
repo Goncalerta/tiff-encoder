@@ -8,6 +8,7 @@ use byteorder::{WriteBytesExt, LittleEndian, BigEndian};
 use std::collections::BTreeMap;
 
 pub mod tiff_type;
+pub mod tag;
 use tiff_type::*;
 
 /// The byte order used within the TIFF file.
@@ -958,7 +959,7 @@ impl SimpleDatablock for ByteBlock {
 
 /// Represents a list of values of any given [`TiffType`].
 /// 
-/// [`TiffType`] tiff_type/trait.TiffType.html
+/// [`TiffType`]: tiff_type/trait.TiffType.html
 pub struct TiffTypeValues<T: TiffType> {
     values: Vec<T>,
 }
