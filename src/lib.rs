@@ -41,10 +41,11 @@ impl Endianness {
 }
 
 /// A helper structure that provides convenience methods to write to
-/// a `fs::File`, being aware of the file's [`Endianness`].
+/// a `fs::File`, being aware of the file's [`Endianness`] and the number
+/// of written bytes.
 /// 
 /// [`Endianness`]: enum.Endianness.html
-pub struct EndianFile {
+struct EndianFile {
     file: fs::File,
     byte_order: Endianness,
     written_bytes: u32,
@@ -57,7 +58,7 @@ impl EndianFile {
     }
 
     /// Writes a u16 to the file.
-    pub fn write_u16(&mut self, n: u16) -> io::Result<()> {
+   pub fn write_u16(&mut self, n: u16) -> io::Result<()> {
         self.written_bytes += 2;
         match self.byte_order {
             Endianness::II => {
@@ -497,11 +498,15 @@ impl Ifd {
     ///     .with_entry(0x0100, UNDEFINED::values(vec![0x42, 0x42, 0x42, 0x42]));
     /// ```
     /// 
+    /// 
     /// # Panics 
     /// 
     /// In order to protect the user of this crate, trying to add a value
     /// to an already existing entry with this method is considered a mistake 
     /// and will `panic`.
+    /// 
+    /// Other functions that insert members to the `Ifd` will have an "Entries" 
+    /// section, where they'll specify which entries are inserted.
     /// 
     /// [`TiffFile`]: struct.TiffFile.html
     pub fn with_entry<T: FieldValues + 'static>(mut self, tag: FieldTag, value: T) -> Self {
@@ -509,6 +514,23 @@ impl Ifd {
             panic!("Tried to add the same tag twice.");
         }
         self
+    }
+
+    /// Returns the same `Ifd`, but adding the given subifds.
+    /// 
+    /// Because of returning the `Ifd`, it is possible to chain this method.
+    /// 
+    /// # Entries
+    /// 
+    /// Using this method will automatically insert the entry 0x14C (tag::SubIFDs).
+    /// 
+    /// # Panics 
+    /// 
+    /// If the inserted entries already exist, this function will `panic`.
+    /// 
+    /// [`TiffFile`]: struct.TiffFile.html
+    pub fn with_subifds(self, subifds: Vec<IfdChain>) -> Self {
+        self.with_entry(tag::SubIFDs, Offsets::new(subifds))
     }
 
     /// Returns an [`IfdChain`] containing solely this `Ifd`.
