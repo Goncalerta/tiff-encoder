@@ -1,5 +1,5 @@
 [package]
-name = "tiff"
+name = "tiff-encoder"
 version = "0.1.0"
 authors = ["PedroGonçaloCorreia <goncalerta@gmail.com>"]
 
