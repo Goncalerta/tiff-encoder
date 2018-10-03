@@ -45,7 +45,7 @@ impl Endianness {
 /// of written bytes.
 /// 
 /// [`Endianness`]: enum.Endianness.html
-struct EndianFile {
+pub struct EndianFile {
     file: fs::File,
     byte_order: Endianness,
     written_bytes: u32,
@@ -168,6 +168,7 @@ impl EndianFile {
 /// 
 /// Holds the number of bytes that were allocated, in order to
 /// calculate the needed offsets.
+#[doc(hidden)]
 pub struct Cursor(u32);
 impl Cursor {
     /// Creates a new `Cursor` with no bytes allocated.
@@ -181,7 +182,7 @@ impl Cursor {
     /// 
     /// The maximum size of a TIFF file is 2**32 bits. Attempting
     /// to allocate more space than that will `panic`.
-    pub fn allocate(&mut self, n: u32) {
+    fn allocate(&mut self, n: u32) {
         self.0 = match self.0.checked_add(n) {
             Some(val) => val,
             None => panic!("Attempted to write a TIFF file bigger than 2**32 bytes."),
@@ -189,7 +190,7 @@ impl Cursor {
     }
 
     /// Returns the number of already allocated bytes.
-    pub fn allocated_bytes(&self) -> u32 {
+    fn allocated_bytes(&self) -> u32 {
         self.0
     }
 }
@@ -248,30 +249,6 @@ impl TiffFile {
     /// ```
     pub fn with_endianness(mut self, endian: Endianness) -> Self {
         self.header.byte_order = endian;
-        self
-    }
-
-    /// Returns the same `TiffFile`, but with the specified magic number.
-    /// 
-    /// # Examples
-    /// 
-    /// As this method returns `Self`, it can be chained with others when
-    /// building a `TiffFile`.
-    /// ```
-    /// let tiff_file = TiffFile::new() (
-    ///     Ifd::new()
-    ///         .with_entry(0x0000, BYTE::single(0))
-    ///         .single()
-    /// ).with_magic_number(43).with_endianness(Endianness::MM);
-    /// ```
-    /// 
-    /// # Panics
-    /// 
-    /// The magic number of a `TiffFile` is always at least 42. Attempting
-    /// to create a TiffFile with a smaller value will panic.
-    pub fn  with_magic_number(mut self, magic_number: u16) -> Self {
-        if magic_number < 42 { panic!("The magic number of a TiffFile cannot be less than 42.") }
-        self.header.magic_number = magic_number;
         self
     }
 
@@ -417,15 +394,10 @@ impl IfdChain {
     pub fn single(ifd: Ifd) -> IfdChain {
         IfdChain::new(vec![ifd])
     }
-}
-impl Datablock for IfdChain {
-    #[doc(hidden)]
-    type Allocated = AllocatedIfdChain;
 
     /// Allocates every `Ifd` in the chain, moving the given `Cursor` forwards.
     /// 
     /// Calling this will transform `self` into an `AllocatedIfdChain`.
-    #[doc(hidden)]
     fn allocate(self, c: &mut Cursor) -> AllocatedIfdChain {
         let len = self.0.len();
         let mut ifds = Vec::with_capacity(len);
@@ -437,9 +409,8 @@ impl Datablock for IfdChain {
 }
 //// An `IfdChain` that called `allocate(&mut Cursor)` and is
 /// ready to write to a file.
-#[doc(hidden)]
-pub struct AllocatedIfdChain(Vec<AllocatedIfd>);
-impl AllocatedDatablock for AllocatedIfdChain {
+struct AllocatedIfdChain(Vec<AllocatedIfd>);
+impl AllocatedIfdChain {
     /// Returns the size of this IfdChain, that is,
     /// 
     /// the sum of the sizes of all the `IFD`s it contains. 
@@ -530,7 +501,7 @@ impl Ifd {
     /// 
     /// [`TiffFile`]: struct.TiffFile.html
     pub fn with_subifds(self, subifds: Vec<IfdChain>) -> Self {
-        self.with_entry(tag::SubIFDs, Offsets::new(subifds))
+        self.with_entry(tag::SubIFDs, OffsetsToIfds::new(subifds))
     }
 
     /// Returns an [`IfdChain`] containing solely this `Ifd`.
@@ -544,7 +515,7 @@ impl Ifd {
     }
 
     /// Returns the number of entries present in this `Ifd`.
-    pub fn entry_count(&self) -> u32 {
+    fn entry_count(&self) -> u32 {
         self.entries.len() as u32
     }
 
@@ -642,12 +613,13 @@ impl AllocatedIfd {
 pub type FieldTag = u16;
 
 /// Seals FieldValues, so that it can only be implemented inside
-/// the crate. There are only two types of FieldValues:
-/// `Offsets` and `TiffTypeValues`.
+/// the crate. There are only three types of FieldValues:
+/// `Offsets` to datablocks, `OffsetsToIfds` and `TiffTypeValues`.
 mod private {
     pub trait Sealed {}
     impl<T: super::Datablock> Sealed for super::Offsets<T> {}
     impl<T: super::TiffType> Sealed for super::TiffTypeValues<T> {}
+    impl Sealed for super::OffsetsToIfds {}
 }
 
 /// The values contained or pointed at by an IFD Field.
@@ -699,68 +671,68 @@ pub trait AllocatedFieldValues {
     fn write_to(self: Box<Self>, file: &mut EndianFile) -> io::Result<()>;
 }
 
-/// Represents a block of data in the file pointed to by a field value, but
-/// that isn't part of the field itself.
-/// 
-/// This includes, for example, subIFDs and image strips.
-/// 
-/// In most cases, it is simpler to implement [`SimpleDatablock`] instead,
-/// which will automatically implement both `Datablock` and its allocated form,
-/// [`AllocatedDatablock`]. Implementing `Datablock` directly is only useful
-/// if there is need to do any special operation during the allocation (for
-/// example, to track the position of the block in the file in order to write
-/// offsets).
-/// 
-/// [`SimpleDatablock`]: trait.SimpleDatablock
-/// [`AllocatedDatablock`]: trait.AllocatedDatablock
-pub trait Datablock {
-    /// The allocated form of this `Datablock`.
-    /// 
-    /// It is valid for a structure to be both its normal and allocated form,
-    /// as long as it doens't need to store any different information after
-    /// allocation. In that case, `type Allocated = Self`.
-    /// 
-    /// However, if you find yourself doing that, consider using [`SimpleDataBlock`]
-    /// instead .
-    /// 
-    /// [`SimpleDatablock`]: trait.SimpleDatablock
-    type Allocated: AllocatedDatablock;
+// /// Represents a block of data in the file pointed to by a field value, but
+// /// that isn't part of the field itself.
+// /// 
+// /// This includes, for example, subIFDs and image strips.
+// /// 
+// /// In most cases, it is simpler to implement [`SimpleDatablock`] instead,
+// /// which will automatically implement both `Datablock` and its allocated form,
+// /// [`AllocatedDatablock`]. Implementing `Datablock` directly is only useful
+// /// if there is need to do any special operation during the allocation (for
+// /// example, to track the position of the block in the file in order to write
+// /// offsets).
+// /// 
+// /// [`SimpleDatablock`]: trait.SimpleDatablock
+// /// [`AllocatedDatablock`]: trait.AllocatedDatablock
+// pub trait Datablock {
+//     /// The allocated form of this `Datablock`.
+//     /// 
+//     /// It is valid for a structure to be both its normal and allocated form,
+//     /// as long as it doens't need to store any different information after
+//     /// allocation. In that case, `type Allocated = Self`.
+//     /// 
+//     /// However, if you find yourself doing that, consider using [`SimpleDataBlock`]
+//     /// instead .
+//     /// 
+//     /// [`SimpleDatablock`]: trait.SimpleDatablock
+//     type Allocated: AllocatedDatablock;
 
-    /// Allocates this `Datablock`, moving the [`Cursor`] forwards exactly
-    /// the same number of bytes as those that will be written in 
-    /// [`write_to(self, &mut EndianFile)`]. Returns its allocated form, [`Self::Allocated`].
-    /// 
-    /// # Panics
-    /// 
-    /// Failing to allocate the exact same number of bytes that will be written
-    /// to the file will `panic`.
-    /// 
-    /// [`write_to(self, &mut EndianFile)`]: trait.AllocatedDatablock.html#method.write_to
-    /// [`Cursor`]: struct.Cursor.html
-    /// [`Self::Allocated`]: #associatedtype.Allocated
-    fn allocate(self, c: &mut Cursor) -> Self::Allocated;
-}
+//     /// Allocates this `Datablock`, moving the [`Cursor`] forwards exactly
+//     /// the same number of bytes as those that will be written in 
+//     /// [`write_to(self, &mut EndianFile)`]. Returns its allocated form, [`Self::Allocated`].
+//     /// 
+//     /// # Panics
+//     /// 
+//     /// Failing to allocate the exact same number of bytes that will be written
+//     /// to the file will `panic`.
+//     /// 
+//     /// [`write_to(self, &mut EndianFile)`]: trait.AllocatedDatablock.html#method.write_to
+//     /// [`Cursor`]: struct.Cursor.html
+//     /// [`Self::Allocated`]: #associatedtype.Allocated
+//     fn allocate(self, c: &mut Cursor) -> Self::Allocated;
+// }
 
-/// Represents a [`Datablock`] that already called [`allocate(self, &mut Cursor)`].
-/// 
-/// [`Datablock`]: trait.Datablock
-/// [`allocate(self, &mut Cursor)`]: trait.Datablock#method.allocate
-pub trait AllocatedDatablock {
+// /// Represents a [`Datablock`] that already called [`allocate(self, &mut Cursor)`].
+// /// 
+// /// [`Datablock`]: trait.Datablock
+// /// [`allocate(self, &mut Cursor)`]: trait.Datablock#method.allocate
+// pub trait AllocatedDatablock {
 
-    /// Writes this `AllocatedDatablock` to an [`EndianFile`]. The number
-    /// of bytes written must be exactly same number as allocated in 
-    /// [`allocate(self, &mut Cursor)`].
-    /// 
-    /// # Panics
-    /// 
-    /// Failing to write the exact same number of bytes as allocated will
-    /// `panic`.
-    /// 
-    /// [`EndianFile`]: struct.EndianFile.html
-    /// [`size(&self)`]: #method.size
-    /// [`allocate(self, &mut Cursor)`]: trait.Datablock.html#method.allocate
-    fn write_to(self, file: &mut EndianFile) -> io::Result<()>;
-}
+//     /// Writes this `AllocatedDatablock` to an [`EndianFile`]. The number
+//     /// of bytes written must be exactly same number as allocated in 
+//     /// [`allocate(self, &mut Cursor)`].
+//     /// 
+//     /// # Panics
+//     /// 
+//     /// Failing to write the exact same number of bytes as allocated will
+//     /// `panic`.
+//     /// 
+//     /// [`EndianFile`]: struct.EndianFile.html
+//     /// [`size(&self)`]: #method.size
+//     /// [`allocate(self, &mut Cursor)`]: trait.Datablock.html#method.allocate
+//     fn write_to(self, file: &mut EndianFile) -> io::Result<()>;
+// }
 
 /// A trait that conveniently implements automatically [`Datablock`] and
 /// [`AllocatedDatablock`].
@@ -771,7 +743,7 @@ pub trait AllocatedDatablock {
 /// 
 /// [`Datablock`]: trait.Datablock
 /// [`AllocatedDatablock`]: trait.AllocatedDatablock
-pub trait SimpleDatablock {
+pub trait Datablock {
     /// The number of bytes occupied by this `Datablock`.
     /// 
     /// # Panics
@@ -798,16 +770,105 @@ pub trait SimpleDatablock {
     /// [`size(&self)`]: #method.size
     fn write_to(self, file: &mut EndianFile) -> io::Result<()>;
 }
-impl<T: SimpleDatablock> Datablock for T {
-    type Allocated = Self;
-    fn allocate(self, c: &mut Cursor) -> Self::Allocated {
-        c.allocate(SimpleDatablock::size(&self));
-        self
+
+/// Represents a list of [`LONG`] values, each pointing to a specific 
+/// [`Datablock`].
+/// 
+/// This structure owns the list of Datablocks instead, so the user
+/// doesn't have to deal with the offsets in the file. It is responsible
+/// for allocating and writing both the offsets and the blocks of data.
+/// 
+/// [`LONG`]:tiff_types/struct.LONG.html
+/// [`Datablock`]: trait.Datablock.html
+pub struct OffsetsToIfds {
+    pub data: Vec<IfdChain>,
+}
+impl OffsetsToIfds {
+    /// Creates a new `Offsets` instance from a vector of [`Datablock`]s.
+    /// 
+    /// [`Datablock`]: trait.Datablock.html
+    pub fn new(ifds: Vec<IfdChain>) -> Self {
+        OffsetsToIfds {
+            data: ifds,
+        }
     }
 }
-impl<T: SimpleDatablock> AllocatedDatablock for T {
-    fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
-        SimpleDatablock::write_to(self, file)
+impl FieldValues for OffsetsToIfds {
+    fn count(&self) -> u32 {
+        self.data.len() as u32
+    }
+
+    fn size(&self) -> u32 {
+        IFD::size() * self.count()
+    }
+
+    fn allocate(self: Box<Self>, c: &mut Cursor) -> Box<AllocatedFieldValues> {
+        let position = Some(c.allocated_bytes());
+        if self.data.len() == 1 {
+            // If there is just one block, the position will point directly at it.
+            // As such, the offsets vector will be kept empty.
+            let offsets = Vec::new();
+            let ifd = self.data.into_iter().next().unwrap(); // Data has size of 1
+            let allocated_data = vec![ifd.allocate(c)];
+            
+            Box::new(AllocatedOffsetsToIfds {
+                position,
+                offsets,
+                data: allocated_data,
+            })
+        } else {
+            c.allocate(self.size());
+            let mut offsets = Vec::with_capacity(self.data.len());
+            let mut allocated_data = Vec::with_capacity(self.data.len());
+
+            for ifd in self.data {
+                offsets.push(IFD(c.allocated_bytes()));
+                allocated_data.push(ifd.allocate(c));
+            }
+
+            Box::new(AllocatedOffsetsToIfds {
+                position,
+                offsets,
+                data: allocated_data,
+            })
+        }
+    }
+}
+
+/// Allocated form of `Offsets`
+struct AllocatedOffsetsToIfds {
+    position: Option<u32>,
+    offsets: Vec<IFD>,
+    data: Vec<AllocatedIfdChain>,
+}
+impl AllocatedFieldValues for AllocatedOffsetsToIfds {
+    fn count(&self) -> u32 {
+        self.data.len() as u32
+    }
+
+    fn size(&self) -> u32 {
+        IFD::size() * self.count()
+    }
+
+    fn position(&self) -> Option<u32> {
+        self.position
+    }
+
+    fn type_id(&self) -> u16 {
+        IFD::id()
+    }
+
+    fn write_to(self: Box<Self>, file: &mut EndianFile) -> io::Result<()> {
+        let unboxed = *self;
+        let Self { data, offsets, ..} = unboxed;
+        for offset in offsets {
+            offset.write_to(file)?;
+        }
+        for ifd in data.into_iter() {
+            ifd.write_to(file)?;
+        }
+        
+        Ok(())
     }
 }
 
@@ -833,18 +894,18 @@ impl<T: Datablock + 'static> Offsets<T> {
         }
     }
 
-    /// Allocates a block and returns it with the number of bytes it allocated.
-    fn allocate_block(block: T, c: &mut Cursor) -> (<T as Datablock>::Allocated, u32)  {
-        let cursor_initial = c.allocated_bytes();
-        let allocated_block = block.allocate(c);
-        let allocated_size = c.allocated_bytes() - cursor_initial;
-        // Internally allocate an extra byte if size is odd.
-        // This guarantes that the next element will
-        // begin on a word-boundary.
-        if allocated_size%2 == 1 { c.allocate(1); }
+    // /// Allocates a block and returns it with the number of bytes it allocated.
+    // fn allocate_block(block: T, c: &mut Cursor) -> (<T as Datablock>::Allocated, u32)  {
+    //     let cursor_initial = c.allocated_bytes();
+    //     let allocated_block = block.allocate(c);
+    //     let allocated_size = c.allocated_bytes() - cursor_initial;
+    //     // Internally allocate an extra byte if size is odd.
+    //     // This guarantes that the next element will
+    //     // begin on a word-boundary.
+    //     if allocated_size%2 == 1 { c.allocate(1); }
 
-        (allocated_block, allocated_size)
-    }
+    //     (allocated_block, allocated_size)
+    // }
 }
 impl<T: Datablock + 'static> FieldValues for Offsets<T> {
     fn count(&self) -> u32 {
@@ -861,54 +922,55 @@ impl<T: Datablock + 'static> FieldValues for Offsets<T> {
             // If there is just one block, the position will point directly at it.
             // As such, the offsets vector will be kept empty.
             let offsets = Vec::new();
-            let block = self.data.into_iter().next().unwrap(); // Data has size of 1
-            let (allocated_block, allocated_size) = Self::allocate_block(block, c);
-            let allocated_data = vec![allocated_block];
-            let allocated_bytes = vec![allocated_size];
+            let block_size = self.data.get(0).unwrap().size(); // Data has size of 1
+
+            // Internally allocate an extra byte if size is odd.
+            // This guarantes that the next element will
+            // begin on a word-boundary.
+            c.allocate(
+                if block_size%2 == 0 {
+                    block_size
+                } else {
+                    block_size+1
+                }
+            );
             
             Box::new(AllocatedOffsets {
                 position,
                 offsets,
-                data: allocated_data,
-                sizes: allocated_bytes
+                data: self.data,
             })
         } else {
             c.allocate(self.size());
             let mut offsets = Vec::with_capacity(self.data.len());
-            let mut allocated_data = Vec::with_capacity(self.data.len());
-            let mut allocated_bytes = Vec::with_capacity(self.data.len());
 
-            for block in self.data {
+            for block in self.data.iter() {
                 offsets.push(LONG(c.allocated_bytes()));
-                let (allocated_block, allocated_size) = Self::allocate_block(block, c);
-                allocated_data.push(allocated_block);
-                allocated_bytes.push(allocated_size);
+                c.allocate(
+                    if block.size()%2 == 0 {
+                        block.size()
+                    } else {
+                        block.size()+1
+                    }
+                );
             }
 
             Box::new(AllocatedOffsets {
                 position,
                 offsets,
-                data: allocated_data,
-                sizes: allocated_bytes,
+                data: self.data,
             })
         }
-    }
-
-    
+    }   
 }
 
 /// Allocated form of `Offsets`
-struct AllocatedOffsets<T: AllocatedDatablock> {
+struct AllocatedOffsets<T: Datablock> {
     position: Option<u32>,
     offsets: Vec<LONG>,
     data: Vec<T>,
-    /// The sizes of the Datablocks.
-    /// 
-    /// Used to ensure the allocated bytes are the same number as 
-    /// the written bytes to the file.
-    sizes: Vec<u32>,
 }
-impl<T: AllocatedDatablock> AllocatedFieldValues for AllocatedOffsets<T> {
+impl<T: Datablock> AllocatedFieldValues for AllocatedOffsets<T> {
     fn count(&self) -> u32 {
         self.data.len() as u32
     }
@@ -927,22 +989,23 @@ impl<T: AllocatedDatablock> AllocatedFieldValues for AllocatedOffsets<T> {
 
     fn write_to(self: Box<Self>, file: &mut EndianFile) -> io::Result<()> {
         let unboxed = *self;
-        let Self { data, offsets, sizes, ..} = unboxed;
+        let Self { data, offsets, ..} = unboxed;
         for offset in offsets {
             offset.write_to(file)?;
         }
-        for (block, size) in data.into_iter().zip(sizes) {
+        for block in data {
             let file_initial = file.written_bytes();
+            let block_size = block.size();
             block.write_to(file)?;
             let mut written_size = file.written_bytes - file_initial;
             // Internally write an extra byte if size is odd.
             // This guarantes that the next element will
             // begin on a word-boundary.
             if written_size%2 == 1 { file.write_arbitrary_byte()? }
-            if written_size != size {
+            if written_size != block_size {
                 panic!(
                     "The number of bytes allocated by the Datablock ({}) is different from the number of bytes written to the file ({}).", 
-                    size, written_size
+                    block_size, written_size
                 )
             }
         }
@@ -966,7 +1029,7 @@ impl ByteBlock {
         Offsets::new(blocks.into_iter().map(|block| ByteBlock(block)).collect())
     }
 }
-impl SimpleDatablock for ByteBlock {
+impl Datablock for ByteBlock {
     fn size(&self) -> u32 {
         self.0.len() as u32
     }

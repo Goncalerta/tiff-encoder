@@ -1,3 +1,5 @@
+#[allow(non_upper_case_globals)]
+
 pub const NewSubfileType: u16 = 0x00FE;
 pub const SubfileType: u16 = 0x00FF;
 pub const ImageWidth: u16 = 0x0100;

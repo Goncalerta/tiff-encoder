@@ -311,16 +311,14 @@ impl TiffType for DOUBLE {
 }
 
 
-
-    // /// Identical to LONG, except that it is only used to point to IFDs. 
-    // ///
-    // /// This type has no use in the crate yet.
-    // /// Instead, the file writes a LONG value pointing to the subifds.
-    // pub struct IFD(u32);
-    // impl TiffType for IFD {
-    //     fn id() -> u16 {13}
-    //     fn size() -> u32 {4}
-    //     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
-    //         file.write_u32(self.0)
-    //     }
-    // }
+/// 32-bit (4-byte) unsigned integer used exclusively to point to IFDs.
+/// 
+/// See 
+pub struct IFD(pub u32);
+impl TiffType for IFD {
+    fn id() -> u16 {13}
+    fn size() -> u32 {4}
+    fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
+        file.write_u32(self.0)
+    }
+}
