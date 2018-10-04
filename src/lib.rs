@@ -102,12 +102,24 @@ pub struct EndianFile {
 }
 impl EndianFile {
     /// Writes a u8 to the file.
+    /// 
+    /// # Errors
+    ///
+    /// This method returns the same errors as [`Write::write_all`].
+    ///
+    /// [`Write::write_all`]: https://doc.rust-lang.org/std/io/trait.Write.html#method.write_all
     pub fn write_u8(&mut self, n: u8) -> io::Result<()> {
         self.written_bytes += 1;
         self.file.write_u8(n)
     }
 
     /// Writes a u16 to the file.
+    /// 
+    /// # Errors
+    ///
+    /// This method returns the same errors as [`Write::write_all`].
+    ///
+    /// [`Write::write_all`]: https://doc.rust-lang.org/std/io/trait.Write.html#method.write_all
    pub fn write_u16(&mut self, n: u16) -> io::Result<()> {
         self.written_bytes += 2;
         match self.byte_order {
@@ -122,6 +134,12 @@ impl EndianFile {
     }
 
     /// Writes a u32 to the file.
+    /// 
+    /// # Errors
+    ///
+    /// This method returns the same errors as [`Write::write_all`].
+    ///
+    /// [`Write::write_all`]: https://doc.rust-lang.org/std/io/trait.Write.html#method.write_all
     pub fn write_u32(&mut self, n: u32) -> io::Result<()> {
         self.written_bytes += 4;
         match self.byte_order {
@@ -136,12 +154,24 @@ impl EndianFile {
     }
 
     /// Writes a i8 to the file.
+    /// 
+    /// # Errors
+    ///
+    /// This method returns the same errors as [`Write::write_all`].
+    ///
+    /// [`Write::write_all`]: https://doc.rust-lang.org/std/io/trait.Write.html#method.write_all
     pub fn write_i8(&mut self, n: i8) -> io::Result<()> {
         self.written_bytes += 1;
         self.file.write_i8(n)
     }
 
     /// Writes a i16 to the file.
+    /// 
+    /// # Errors
+    ///
+    /// This method returns the same errors as [`Write::write_all`].
+    ///
+    /// [`Write::write_all`]: https://doc.rust-lang.org/std/io/trait.Write.html#method.write_all
     pub fn write_i16(&mut self, n: i16) -> io::Result<()> {
         self.written_bytes += 2;
         match self.byte_order {
@@ -156,6 +186,12 @@ impl EndianFile {
     }
 
     /// Writes a i32 to the file.
+    /// 
+    /// # Errors
+    ///
+    /// This method returns the same errors as [`Write::write_all`].
+    ///
+    /// [`Write::write_all`]: https://doc.rust-lang.org/std/io/trait.Write.html#method.write_all
     pub fn write_i32(&mut self, n: i32) -> io::Result<()> {
         self.written_bytes += 4;
         match self.byte_order {
@@ -170,6 +206,12 @@ impl EndianFile {
     }
 
     /// Writes a f32 to the file.
+    /// 
+    /// # Errors
+    ///
+    /// This method returns the same errors as [`Write::write_all`].
+    ///
+    /// [`Write::write_all`]: https://doc.rust-lang.org/std/io/trait.Write.html#method.write_all
     pub fn write_f32(&mut self, n: f32) -> io::Result<()> {
         self.written_bytes += 4;
         match self.byte_order {
@@ -184,6 +226,12 @@ impl EndianFile {
     }
 
     /// Writes a f64 to the file.
+    /// 
+    /// # Errors
+    ///
+    /// This method returns the same errors as [`Write::write_all`].
+    ///
+    /// [`Write::write_all`]: https://doc.rust-lang.org/std/io/trait.Write.html#method.write_all
     pub fn write_f64(&mut self, n: f64) -> io::Result<()> {
         self.written_bytes += 8;
         match self.byte_order {
@@ -327,6 +375,12 @@ impl TiffFile {
     ///         .single()
     /// ).write_to("file.tif").unwrap();
     /// ```
+    /// 
+    /// # Errors
+    ///
+    /// This method returns the same errors as [`Write::write_all`].
+    ///
+    /// [`Write::write_all`]: https://doc.rust-lang.org/std/io/trait.Write.html#method.write_all
     /// 
     /// # Panics
     /// 
