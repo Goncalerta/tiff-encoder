@@ -1,0 +1,678 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `tag` mod in crate `tiff_encoder`."><meta name="keywords" content="rust, rustlang, rust-lang, tag"><title>tiff_encoder::tag - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module tag</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#constants">Constants</a></li></ul></div><p class='location'><a href='../index.html'>tiff_encoder</a></p><script>window.sidebarCurrent = {name: 'tag', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>tiff_encoder</a>::<wbr><a class="mod" href=''>tag</a></span><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../src/tiff_encoder/tag.rs.html#1-104' title='goto source code'>[src]</a></span></h1><div class='docblock'><p>Constants for commonly used tags in TIFF files, baseline
+or extended.</p>
+<p>Check the <a href="https://www.awaresystems.be/imaging/tiff/tifftags.html">Tiff Tag Reference</a>
+for more information on each tag.</p>
+</div><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.Artist.html"
+                                  title='constant tiff_encoder::tag::Artist'>Artist</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.BadFaxLines.html"
+                                  title='constant tiff_encoder::tag::BadFaxLines'>BadFaxLines</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.BitsPerSample.html"
+                                  title='constant tiff_encoder::tag::BitsPerSample'>BitsPerSample</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.CellLength.html"
+                                  title='constant tiff_encoder::tag::CellLength'>CellLength</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.CellWidth.html"
+                                  title='constant tiff_encoder::tag::CellWidth'>CellWidth</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.CleanFaxData.html"
+                                  title='constant tiff_encoder::tag::CleanFaxData'>CleanFaxData</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ClipPath.html"
+                                  title='constant tiff_encoder::tag::ClipPath'>ClipPath</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.CodingMethods.html"
+                                  title='constant tiff_encoder::tag::CodingMethods'>CodingMethods</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ColorMap.html"
+                                  title='constant tiff_encoder::tag::ColorMap'>ColorMap</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.Compression.html"
+                                  title='constant tiff_encoder::tag::Compression'>Compression</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ConsecutiveBadFaxLines.html"
+                                  title='constant tiff_encoder::tag::ConsecutiveBadFaxLines'>ConsecutiveBadFaxLines</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.Copyright.html"
+                                  title='constant tiff_encoder::tag::Copyright'>Copyright</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DateTime.html"
+                                  title='constant tiff_encoder::tag::DateTime'>DateTime</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.Decode.html"
+                                  title='constant tiff_encoder::tag::Decode'>Decode</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DefaultImageColor.html"
+                                  title='constant tiff_encoder::tag::DefaultImageColor'>DefaultImageColor</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DocumentName.html"
+                                  title='constant tiff_encoder::tag::DocumentName'>DocumentName</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DotRange.html"
+                                  title='constant tiff_encoder::tag::DotRange'>DotRange</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ExtraSamples.html"
+                                  title='constant tiff_encoder::tag::ExtraSamples'>ExtraSamples</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.FaxProfile.html"
+                                  title='constant tiff_encoder::tag::FaxProfile'>FaxProfile</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.FillOrder.html"
+                                  title='constant tiff_encoder::tag::FillOrder'>FillOrder</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.FreeByteCounts.html"
+                                  title='constant tiff_encoder::tag::FreeByteCounts'>FreeByteCounts</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.FreeOffsets.html"
+                                  title='constant tiff_encoder::tag::FreeOffsets'>FreeOffsets</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.GlobalParametersIFD.html"
+                                  title='constant tiff_encoder::tag::GlobalParametersIFD'>GlobalParametersIFD</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.GrayResponseCurve.html"
+                                  title='constant tiff_encoder::tag::GrayResponseCurve'>GrayResponseCurve</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.GrayResponseUnit.html"
+                                  title='constant tiff_encoder::tag::GrayResponseUnit'>GrayResponseUnit</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.HalftoneHints.html"
+                                  title='constant tiff_encoder::tag::HalftoneHints'>HalftoneHints</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.HostComputer.html"
+                                  title='constant tiff_encoder::tag::HostComputer'>HostComputer</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ImageDescription.html"
+                                  title='constant tiff_encoder::tag::ImageDescription'>ImageDescription</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ImageID.html"
+                                  title='constant tiff_encoder::tag::ImageID'>ImageID</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ImageLayer.html"
+                                  title='constant tiff_encoder::tag::ImageLayer'>ImageLayer</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ImageLength.html"
+                                  title='constant tiff_encoder::tag::ImageLength'>ImageLength</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ImageWidth.html"
+                                  title='constant tiff_encoder::tag::ImageWidth'>ImageWidth</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.Indexed.html"
+                                  title='constant tiff_encoder::tag::Indexed'>Indexed</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.InkNames.html"
+                                  title='constant tiff_encoder::tag::InkNames'>InkNames</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.InkSet.html"
+                                  title='constant tiff_encoder::tag::InkSet'>InkSet</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.JPEGACTables.html"
+                                  title='constant tiff_encoder::tag::JPEGACTables'>JPEGACTables</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.JPEGDCTables.html"
+                                  title='constant tiff_encoder::tag::JPEGDCTables'>JPEGDCTables</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.JPEGInterchangeFormat.html"
+                                  title='constant tiff_encoder::tag::JPEGInterchangeFormat'>JPEGInterchangeFormat</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.JPEGInterchangeFormatLength.html"
+                                  title='constant tiff_encoder::tag::JPEGInterchangeFormatLength'>JPEGInterchangeFormatLength</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.JPEGLosslessPredictors.html"
+                                  title='constant tiff_encoder::tag::JPEGLosslessPredictors'>JPEGLosslessPredictors</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.JPEGPointTransforms.html"
+                                  title='constant tiff_encoder::tag::JPEGPointTransforms'>JPEGPointTransforms</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.JPEGProc.html"
+                                  title='constant tiff_encoder::tag::JPEGProc'>JPEGProc</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.JPEGQTables.html"
+                                  title='constant tiff_encoder::tag::JPEGQTables'>JPEGQTables</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.JPEGRestartInterval.html"
+                                  title='constant tiff_encoder::tag::JPEGRestartInterval'>JPEGRestartInterval</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.JPEGTables.html"
+                                  title='constant tiff_encoder::tag::JPEGTables'>JPEGTables</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.Make.html"
+                                  title='constant tiff_encoder::tag::Make'>Make</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.MaxSampleValue.html"
+                                  title='constant tiff_encoder::tag::MaxSampleValue'>MaxSampleValue</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.MinSampleValue.html"
+                                  title='constant tiff_encoder::tag::MinSampleValue'>MinSampleValue</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ModeNumber.html"
+                                  title='constant tiff_encoder::tag::ModeNumber'>ModeNumber</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.Model.html"
+                                  title='constant tiff_encoder::tag::Model'>Model</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.NewSubfileType.html"
+                                  title='constant tiff_encoder::tag::NewSubfileType'>NewSubfileType</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.NumberOfInks.html"
+                                  title='constant tiff_encoder::tag::NumberOfInks'>NumberOfInks</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.OPIProxy.html"
+                                  title='constant tiff_encoder::tag::OPIProxy'>OPIProxy</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.Orientation.html"
+                                  title='constant tiff_encoder::tag::Orientation'>Orientation</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.PageName.html"
+                                  title='constant tiff_encoder::tag::PageName'>PageName</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.PageNumber.html"
+                                  title='constant tiff_encoder::tag::PageNumber'>PageNumber</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.PhotometricInterpretation.html"
+                                  title='constant tiff_encoder::tag::PhotometricInterpretation'>PhotometricInterpretation</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.PlanarConfiguration.html"
+                                  title='constant tiff_encoder::tag::PlanarConfiguration'>PlanarConfiguration</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.Predictor.html"
+                                  title='constant tiff_encoder::tag::Predictor'>Predictor</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.PrimaryChromaticities.html"
+                                  title='constant tiff_encoder::tag::PrimaryChromaticities'>PrimaryChromaticities</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ProfileType.html"
+                                  title='constant tiff_encoder::tag::ProfileType'>ProfileType</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ReferenceBlackWhite.html"
+                                  title='constant tiff_encoder::tag::ReferenceBlackWhite'>ReferenceBlackWhite</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ResolutionUnit.html"
+                                  title='constant tiff_encoder::tag::ResolutionUnit'>ResolutionUnit</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.RowsPerStrip.html"
+                                  title='constant tiff_encoder::tag::RowsPerStrip'>RowsPerStrip</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.SMaxSampleValue.html"
+                                  title='constant tiff_encoder::tag::SMaxSampleValue'>SMaxSampleValue</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.SMinSampleValue.html"
+                                  title='constant tiff_encoder::tag::SMinSampleValue'>SMinSampleValue</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.SampleFormat.html"
+                                  title='constant tiff_encoder::tag::SampleFormat'>SampleFormat</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.SamplesPerPixel.html"
+                                  title='constant tiff_encoder::tag::SamplesPerPixel'>SamplesPerPixel</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.Software.html"
+                                  title='constant tiff_encoder::tag::Software'>Software</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.StripByteCounts.html"
+                                  title='constant tiff_encoder::tag::StripByteCounts'>StripByteCounts</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.StripOffsets.html"
+                                  title='constant tiff_encoder::tag::StripOffsets'>StripOffsets</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.StripRowCounts.html"
+                                  title='constant tiff_encoder::tag::StripRowCounts'>StripRowCounts</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.SubIFDs.html"
+                                  title='constant tiff_encoder::tag::SubIFDs'>SubIFDs</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.SubfileType.html"
+                                  title='constant tiff_encoder::tag::SubfileType'>SubfileType</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.T4Options.html"
+                                  title='constant tiff_encoder::tag::T4Options'>T4Options</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.T6Options.html"
+                                  title='constant tiff_encoder::tag::T6Options'>T6Options</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.TargetPrinter.html"
+                                  title='constant tiff_encoder::tag::TargetPrinter'>TargetPrinter</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.Threshholding.html"
+                                  title='constant tiff_encoder::tag::Threshholding'>Threshholding</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.TileByteCounts.html"
+                                  title='constant tiff_encoder::tag::TileByteCounts'>TileByteCounts</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.TileLength.html"
+                                  title='constant tiff_encoder::tag::TileLength'>TileLength</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.TileOffsets.html"
+                                  title='constant tiff_encoder::tag::TileOffsets'>TileOffsets</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.TileWidth.html"
+                                  title='constant tiff_encoder::tag::TileWidth'>TileWidth</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.TransferFunction.html"
+                                  title='constant tiff_encoder::tag::TransferFunction'>TransferFunction</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.TransferRange.html"
+                                  title='constant tiff_encoder::tag::TransferRange'>TransferRange</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.VersionYear.html"
+                                  title='constant tiff_encoder::tag::VersionYear'>VersionYear</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.WhitePoint.html"
+                                  title='constant tiff_encoder::tag::WhitePoint'>WhitePoint</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.XClipPathUnits.html"
+                                  title='constant tiff_encoder::tag::XClipPathUnits'>XClipPathUnits</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.XMP.html"
+                                  title='constant tiff_encoder::tag::XMP'>XMP</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.XPosition.html"
+                                  title='constant tiff_encoder::tag::XPosition'>XPosition</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.XResolution.html"
+                                  title='constant tiff_encoder::tag::XResolution'>XResolution</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.YCbCrCoefficients.html"
+                                  title='constant tiff_encoder::tag::YCbCrCoefficients'>YCbCrCoefficients</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.YCbCrPositioning.html"
+                                  title='constant tiff_encoder::tag::YCbCrPositioning'>YCbCrPositioning</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.YCbCrSubSampling.html"
+                                  title='constant tiff_encoder::tag::YCbCrSubSampling'>YCbCrSubSampling</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.YClipPathUnits.html"
+                                  title='constant tiff_encoder::tag::YClipPathUnits'>YClipPathUnits</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.YPosition.html"
+                                  title='constant tiff_encoder::tag::YPosition'>YPosition</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.YResolution.html"
+                                  title='constant tiff_encoder::tag::YResolution'>YResolution</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "tiff_encoder";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>
