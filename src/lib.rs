@@ -1,14 +1,65 @@
-//! A crate for encoding TIFF files. (WIP)
+//! A crate for encoding TIFF files.
+//! 
+//! This crate allows to create any hierarchy of IFDs and to add any
+//! tags with any values to each. It does so while avoiding that
+//! the user needs to worry about the position of each structure in the
+//! file and to point to it with the correct offset.
+//! 
+//! The main structure of this crate, used to actually write the TIFF
+//! file, the is [`TiffFile`]. This structure writes the file in [little endian]
+//! by default (but that can be changed) and requires an [`IfdChain`]. This
+//! `IfdChain` consists of the first [`Ifd`] of the file, the one it points to (if any), 
+//! and so on. Each `Ifd` has one or more entries, which are represented 
+//! by a pair of [`FieldTag`] and [`FieldValues`].
+//! 
+//! # Examples
+//! 
+//! Creating a 256x256 bilevel image with every pixel black.
+//! 
+//! ```
+//! use tiff_encoder::*;
+//! use tiff_encoder::tiff_type::*;
+//! 
+//! // 256*256/8 = 8192
+//! // The image data will have 8192 bytes with 0 in every bit (each representing a
+//! // black pixel).
+//! let image_data = vec![0x00; 8192];
+//! 
+//! TiffFile::new(
+//!     Ifd::new()
+//!         .with_entry(tag::PhotometricInterpretation, SHORT::single(1)) // Black is zero
+//!         .with_entry(tag::Compression, SHORT::single(1)) // No compression
+//!
+//!         .with_entry(tag::ImageLength, LONG::single(256))
+//!         .with_entry(tag::ImageWidth, LONG::single(256))
+//!
+//!         .with_entry(tag::ResolutionUnit, SHORT::single(1)) // No resolution unit
+//!         .with_entry(tag::XResolution, RATIONAL::single(1, 1))
+//!         .with_entry(tag::YResolution, RATIONAL::single(1, 1))
+//!
+//!         .with_entry(tag::RowsPerStrip, LONG::single(256)) // One strip for the whole image
+//!         .with_entry(tag::StripByteCounts, LONG::single(8192)) 
+//!         .with_entry(tag::StripOffsets, ByteBlock::single(image_data))
+//!         .single() // This is the only Ifd in its IfdChain
+//! ).write_to("example.tif").unwrap();
+//! ```
+//! 
+//! [`TiffFile`]: struct.TiffFile.html
+//! [little endian]: enum.Endianness.html#variant.II
+//! [`Ifd`]: struct.Ifd.html
+//! [`IfdChain`]: struct.IfdChain.html
+//! [`FieldTag`]: type.FieldTag.html
+//! [`FieldValues`]: trait.FieldValues.html
 
 extern crate byteorder;
+
+pub mod tiff_type;
+pub mod tag;
 
 use std::fs;
 use std::io;
 use byteorder::{WriteBytesExt, LittleEndian, BigEndian};
 use std::collections::BTreeMap;
-
-pub mod tiff_type;
-pub mod tag;
 use tiff_type::*;
 
 /// The byte order used within the TIFF file.
@@ -29,9 +80,9 @@ pub enum Endianness {
     /// the least significant byte.
     MM,
 }
-
 impl Endianness {
-    /// Returns the u16 value that represents the given endianness in a TIF Header.
+    /// Returns the u16 value that represents the given endianness 
+    /// in a Tagged Image File Header.
     fn id(&self) -> u16 {
         match &self {
             Endianness::II => 0x4949,
@@ -41,8 +92,7 @@ impl Endianness {
 }
 
 /// A helper structure that provides convenience methods to write to
-/// a `fs::File`, being aware of the file's [`Endianness`] and the number
-/// of written bytes.
+/// a `fs::File`, being aware of the file's [`Endianness`].
 /// 
 /// [`Endianness`]: enum.Endianness.html
 pub struct EndianFile {
@@ -151,8 +201,8 @@ impl EndianFile {
     /// 
     /// This is useful when there is need to write an extra byte
     /// to guarantee that all offsets are even but that byte
-    /// doesn't hold any information.
-    pub fn write_arbitrary_byte(&mut self) -> io::Result<()> {
+    /// doesn't really hold any information.
+    fn write_arbitrary_byte(&mut self) -> io::Result<()> {
         self.written_bytes += 1;
         self.file.write_u8(0)
     }
@@ -196,6 +246,9 @@ impl Cursor {
 }
 
 /// Representation of a Tagged Image File.
+/// 
+/// This is the central structure of the crate. It holds all the other structures
+/// of the TIFF file and is responsible for writing them to a `fs::File`.
 pub struct TiffFile {
     header: TiffHeader,
     ifds: IfdChain,
@@ -206,14 +259,16 @@ impl TiffFile {
     /// Creates a new `TiffFile` from an [`IfdChain`].
     /// 
     /// By default, a `TiffFile` is little-endian and has 42 as the magic number.
-    /// If you want to change this for some reason, consider chaining this function wih
-    /// [`with_endianness`] or [`with_magic_number`], respectively.
+    /// If you want to change the endianness, consider chaining this function wih
+    /// [`with_endianness`].
     /// 
     /// # Examples
     /// 
-    /// Creating the simplest `TiffFile`: a single [`Ifd`] with only one entry.
+    /// Creating the simplest valid `TiffFile`: a single [`Ifd`] with only one entry.
     /// ```
-    /// let tiff_file = TiffFile::new() (
+    /// use tiff_encoder::*;
+    /// use tiff_encoder::tiff_type::*;
+    /// let tiff_file = TiffFile::new(
     ///     Ifd::new()
     ///         .with_entry(0x0000, BYTE::single(0))
     ///         .single()
@@ -222,7 +277,6 @@ impl TiffFile {
     /// [`Ifd`]: struct.Ifd.html
     /// [`IfdChain`]: struct.IfdChain.html
     /// [`with_endianness`]: #method.with_endianness
-    /// [`with_magic_number`]: #method.with_magic_number
     pub fn new(ifds: IfdChain) -> TiffFile {
         TiffFile {
             header: TiffHeader {
@@ -238,46 +292,58 @@ impl TiffFile {
     /// 
     /// # Examples
     /// 
-    /// As this method returns `Self`, it can be chained with others when
+    /// As this method returns `Self`, it can be chained when
     /// building a `TiffFile`.
     /// ```
-    /// let tiff_file = TiffFile::new() (
+    /// use tiff_encoder::*;
+    /// use tiff_encoder::tiff_type::*;
+    /// 
+    /// let tiff_file = TiffFile::new(
     ///     Ifd::new()
     ///         .with_entry(0x0000, BYTE::single(0))
     ///         .single()
-    /// ).with_endianness(Endianness::MM).with_magic_number(43);
+    /// ).with_endianness(Endianness::MM);
     /// ```
     pub fn with_endianness(mut self, endian: Endianness) -> Self {
         self.header.byte_order = endian;
         self
     }
 
-    /// Writes the `TiffFile`, creating a new file at the given path.
+    /// Writes the `TiffFile` content to a new file created at the given path.
     /// 
-    /// Doing so consumes the `TiffFile`. Returns the new file wrapped in
+    /// Doing so consumes the `TiffFile`. Returns the new `fs::File` wrapped in
     /// an `io::Result`.
     /// 
     /// # Examples
     /// 
-    /// Note that in this example, `file` is a `fs::File`, not a `TiffFile`.
+    /// Note that, in this example, `file` is a `fs::File`, not a `TiffFile`.
     /// ```
-    /// let file = TiffFile::new() (
+    /// use tiff_encoder::*;
+    /// use tiff_encoder::tiff_type::*;
+    /// 
+    /// let file = TiffFile::new(
     ///     Ifd::new()
     ///         .with_entry(0x0000, BYTE::single(0))
     ///         .single()
     /// ).write_to("file.tif").unwrap();
     /// ```
+    /// 
+    /// # Panics
+    /// 
+    /// This function will `panic` if the file trying to be written would exceed
+    /// the maximum size of a TIFF file (2**32 bytes, or 4 GiB). 
     pub fn write_to(self, file_path: &str) -> io::Result<fs::File> {
         let file = fs::File::create(file_path)?;
-        // Writing to a file is comprised of two phases: "Allocating Phase" 
-        // and "Writting Phase". During the first, all the components of the
-        // TiffFile allocate their space and become aware of the offsets they
-        // need to know. In the "Writting Phase", the components actually 
-        // write their information to the file they've been allocated to.
+        // Writing to a file is comprised of two phases: the "Allocating Phase" 
+        // and the "Writting Phase". During the first, all the components of the
+        // TiffFile allocate their space and become aware of the offsets to other
+        // components that they might need to know. In the "Writting Phase", the 
+        // components actually write their information to the file they've been 
+        // allocated to.
         self.allocate(file).write()
     }
 
-    /// Allocates all its components to the given file, transforming
+    /// Allocates all of its components to the given file, transforming
     /// itself into an `AllocatedTiffFile`.
     fn allocate(self, file: fs::File) -> AllocatedTiffFile {
         let mut c = Cursor::new();
@@ -359,6 +425,14 @@ impl AllocatedTiffHeader {
 
 
 /// An ordered list of [`Ifd`]s, each pointing to the next one.
+/// 
+/// The last `Ifd` doesn't point to any other. 
+/// 
+/// Because any IFD could technically point to a next one, in most 
+/// functions that one would expect to input an `Ifd`, its parameters 
+/// actually ask for an `IfdChain`.
+/// 
+/// [`Ifd`]: struct.Ifd.html
 pub struct IfdChain(Vec<Ifd>);
 impl IfdChain {
     /// Creates a new `IfdChain` from a vector of [`Ifd`]s.
@@ -368,7 +442,6 @@ impl IfdChain {
     /// The TIFF specification requires that each IFD must have at least one entry.
     /// 
     /// Trying to create an `IfdChain` with one or more empty `Ifd`s will `panic`.
-    /// 
     /// 
     /// [`Ifd`]: struct.Ifd.html
     pub fn new(ifds: Vec<Ifd>) -> IfdChain {
@@ -407,17 +480,11 @@ impl IfdChain {
         AllocatedIfdChain(ifds)
     } 
 }
-//// An `IfdChain` that called `allocate(&mut Cursor)` and is
+
+/// An `IfdChain` that called `allocate(&mut Cursor)` and is
 /// ready to write to a file.
 struct AllocatedIfdChain(Vec<AllocatedIfd>);
 impl AllocatedIfdChain {
-    /// Returns the size of this IfdChain, that is,
-    /// 
-    /// the sum of the sizes of all the `IFD`s it contains. 
-    // fn size(&self) -> u32 {
-    //     self.0.iter().map(|ifd| ifd.size()).sum()
-    // }
-
     /// Write all of the `IFD`s in this chain to the given `EndianFile`.
     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
         for ifd in self.0.into_iter() {
@@ -426,8 +493,22 @@ impl AllocatedIfdChain {
         Ok(())
     }
 }
+
 /// A structure that holds both an IFD and all the values pointed at
 /// by its entries.
+/// 
+/// In a TIFF file, an IFD may point to another IFD with its last 4
+/// bytes. To abstract the user of this crate from the position of each
+/// structure in the file, this link between `Ifd`s is represented by
+/// an [`IfdChain`]. Because any IFD could technically point to a next
+/// one, in most functions that one would expect to input an `Ifd`, its
+/// parameters actually ask for an `IfdChain`.
+/// 
+/// One can easily create an `IfdChain` of a single `Ifd` calling the
+/// method [`single()`] on that Ifd.
+/// 
+/// [`IfdChain`]: struct.IfdChain.html
+/// [`single()`]: #method.single
 pub struct Ifd {
     entries: BTreeMap<FieldTag, Box<FieldValues>>,
 }
@@ -439,9 +520,9 @@ impl Ifd {
     /// alone in the creation of a TIFF file.
     /// 
     /// However, one can chain this function with methods such as 
-    /// [`with_entry(FielTag, FieldValues)`] in order to build a valid `Ifd`.
+    /// [`with_entry(FieldTag, FieldValues)`] in order to build a valid `Ifd`.
     /// 
-    /// [`with_entry(FielTag, FieldValues)`]: #method.with_entry
+    /// [`with_entry(FieldTag, FieldValues)`]: #method.with_entry
     pub fn new() -> Ifd {
         Ifd {
             entries: BTreeMap::new(),
@@ -450,17 +531,20 @@ impl Ifd {
 
     /// Returns the same `Ifd`, but adding the given pair of Tag and Values.
     /// 
-    /// Because of returning the `Ifd`, it is possible to chain this method.
+    /// Because it returns `Self`, it is possible to chain this method.
     /// 
     /// # Examples
     /// 
     /// Creating a [`TiffFile`] with some arbitrary entries.
     /// 
-    /// Note in which entries are added is irrelevant. Internally, the
-    /// `Ifd` will arrange them automatically by ascending order of tags, as
+    /// Note that the order in which entries are added is irrelevant. Internally, 
+    /// the `Ifd` will automatically arrange them by ascending order of tags, as
     /// specified by the TIFF specification.
     /// 
     /// ```
+    /// use tiff_encoder::*;
+    /// use tiff_encoder::tiff_type::*;
+    /// 
     /// let ifd = Ifd::new()
     ///     .with_entry(0x0000, BYTE::single(0))
     ///     .with_entry(0x00FF, LONG::single(500))
@@ -468,7 +552,6 @@ impl Ifd {
     ///     .with_entry(0x0005, ASCII::from_str("Hello TIFF!"))
     ///     .with_entry(0x0100, UNDEFINED::values(vec![0x42, 0x42, 0x42, 0x42]));
     /// ```
-    /// 
     /// 
     /// # Panics 
     /// 
@@ -489,11 +572,11 @@ impl Ifd {
 
     /// Returns the same `Ifd`, but adding the given subifds.
     /// 
-    /// Because of returning the `Ifd`, it is possible to chain this method.
+    /// Because it returns `Self`, it is possible to chain this method.
     /// 
     /// # Entries
     /// 
-    /// Using this method will automatically insert the entry 0x14C (tag::SubIFDs).
+    /// Using this method will automatically insert the entry 0x014A (tag::SubIFDs).
     /// 
     /// # Panics 
     /// 
@@ -522,7 +605,8 @@ impl Ifd {
     /// Returns the number of bytes occupied by this `Ifd` in its binary form.
     /// 
     /// Note that this only includes the IFD itself, not the values associated
-    /// with it that don't fit in their entry.
+    /// with it that don't fit in their entry nor the blocks of data pointed at by
+    /// some of the fields.
     fn size(&self) -> u32 {
         self.entry_count() * 12 + 6
     }
@@ -610,6 +694,11 @@ impl AllocatedIfd {
 }
 
 /// 16-bit identifier of a field entry.
+/// 
+/// The module [`tag`] has some constants for commonly used
+/// `FieldTag`s.
+/// 
+/// [`tag`]: ./tag/index.html
 pub type FieldTag = u16;
 
 /// Seals FieldValues, so that it can only be implemented inside
@@ -624,18 +713,22 @@ mod private {
 
 /// The values contained or pointed at by an IFD Field.
 /// 
-/// There are two big groups of `FieldValues`: [`TiffTypeValues`]
-/// and [`Offsets`]. The first represents a list of values of any
-/// given [`TiffType`]. The second represents a list of [`LONG`]
-/// values, each pointing to a specific [`Datablock`].
+/// There are three groups of `FieldValues`: [`TiffTypeValues`],
+/// [`Offsets`] and [`OffsetsToIfds`]. The first represents a list 
+/// of values of any given [`TiffType`]. The second represents a 
+/// list of [`LONG`] values, each pointing to a specific [`Datablock`].
+/// The third represents a list of [`IFD`] values, each pointing to
+/// an [`Ifd`].
 /// 
 /// It is not possible to implement this trait manually outside of
 /// this crate.
 /// 
 /// [`TiffTypeValues`]: struct.TiffTypeValues.html
 /// [`Offsets`]: struct.Offsets.html
-/// [`TiffType`]: tiff_types/trait.TiffType.html
-/// [`LONG`]:tiff_types/struct.LONG.html
+/// [`OffsetsToIfds`]: struct.OffsetsToIfds.html
+/// [`TiffType`]: tiff_type/trait.TiffType.html
+/// [`LONG`]:tiff_type/struct.LONG.html
+/// [`IFD`]:tiff_type/struct.IFD.html
 /// [`Datablock`]: trait.Datablock.html
 pub trait FieldValues: private::Sealed {
     /// The number of values the field contains.
@@ -651,6 +744,7 @@ pub trait FieldValues: private::Sealed {
     #[doc(hidden)]
     fn allocate(self: Box<Self>, c: &mut Cursor) -> Box<AllocatedFieldValues>;
 }
+
 /// Allocated form of `FieldValues`
 #[doc(hidden)]
 pub trait AllocatedFieldValues {
@@ -671,78 +765,19 @@ pub trait AllocatedFieldValues {
     fn write_to(self: Box<Self>, file: &mut EndianFile) -> io::Result<()>;
 }
 
-// /// Represents a block of data in the file pointed to by a field value, but
-// /// that isn't part of the field itself.
-// /// 
-// /// This includes, for example, subIFDs and image strips.
-// /// 
-// /// In most cases, it is simpler to implement [`SimpleDatablock`] instead,
-// /// which will automatically implement both `Datablock` and its allocated form,
-// /// [`AllocatedDatablock`]. Implementing `Datablock` directly is only useful
-// /// if there is need to do any special operation during the allocation (for
-// /// example, to track the position of the block in the file in order to write
-// /// offsets).
-// /// 
-// /// [`SimpleDatablock`]: trait.SimpleDatablock
-// /// [`AllocatedDatablock`]: trait.AllocatedDatablock
-// pub trait Datablock {
-//     /// The allocated form of this `Datablock`.
-//     /// 
-//     /// It is valid for a structure to be both its normal and allocated form,
-//     /// as long as it doens't need to store any different information after
-//     /// allocation. In that case, `type Allocated = Self`.
-//     /// 
-//     /// However, if you find yourself doing that, consider using [`SimpleDataBlock`]
-//     /// instead .
-//     /// 
-//     /// [`SimpleDatablock`]: trait.SimpleDatablock
-//     type Allocated: AllocatedDatablock;
-
-//     /// Allocates this `Datablock`, moving the [`Cursor`] forwards exactly
-//     /// the same number of bytes as those that will be written in 
-//     /// [`write_to(self, &mut EndianFile)`]. Returns its allocated form, [`Self::Allocated`].
-//     /// 
-//     /// # Panics
-//     /// 
-//     /// Failing to allocate the exact same number of bytes that will be written
-//     /// to the file will `panic`.
-//     /// 
-//     /// [`write_to(self, &mut EndianFile)`]: trait.AllocatedDatablock.html#method.write_to
-//     /// [`Cursor`]: struct.Cursor.html
-//     /// [`Self::Allocated`]: #associatedtype.Allocated
-//     fn allocate(self, c: &mut Cursor) -> Self::Allocated;
-// }
-
-// /// Represents a [`Datablock`] that already called [`allocate(self, &mut Cursor)`].
-// /// 
-// /// [`Datablock`]: trait.Datablock
-// /// [`allocate(self, &mut Cursor)`]: trait.Datablock#method.allocate
-// pub trait AllocatedDatablock {
-
-//     /// Writes this `AllocatedDatablock` to an [`EndianFile`]. The number
-//     /// of bytes written must be exactly same number as allocated in 
-//     /// [`allocate(self, &mut Cursor)`].
-//     /// 
-//     /// # Panics
-//     /// 
-//     /// Failing to write the exact same number of bytes as allocated will
-//     /// `panic`.
-//     /// 
-//     /// [`EndianFile`]: struct.EndianFile.html
-//     /// [`size(&self)`]: #method.size
-//     /// [`allocate(self, &mut Cursor)`]: trait.Datablock.html#method.allocate
-//     fn write_to(self, file: &mut EndianFile) -> io::Result<()>;
-// }
-
-/// A trait that conveniently implements automatically [`Datablock`] and
-/// [`AllocatedDatablock`].
+/// A block of data in the file pointed to by a field value, but
+/// that isn't part of the field itself (such as image strips).
 /// 
-/// In the vast majority of cases, the `Datablock` doesn't need to be aware of 
-/// its position in the file. In those cases, implementing this trait is
-/// preferable in relation to directly implementing the two mentioned earlier.
+/// It is also possible to store any block of data in a [`ByteBlock`],
+/// but that would require to know the [`Endianness`] of the file
+/// beforehand, so the bytes are written in the correct order.
 /// 
-/// [`Datablock`]: trait.Datablock
-/// [`AllocatedDatablock`]: trait.AllocatedDatablock
+/// Using a `Datablock`, on the other hand, allows to make use
+/// of the functionality of an [`EndianFile`], so the data can be
+/// written without worrying about the endianness.
+/// 
+/// [`ByteBlock`]: struct.ByteBlock.html
+/// [`Endianness`]: enum.Endianness.html
 pub trait Datablock {
     /// The number of bytes occupied by this `Datablock`.
     /// 
@@ -771,22 +806,28 @@ pub trait Datablock {
     fn write_to(self, file: &mut EndianFile) -> io::Result<()>;
 }
 
-/// Represents a list of [`LONG`] values, each pointing to a specific 
-/// [`Datablock`].
+/// A list of [`IFD`] values, each pointing to a specific 
+/// [`Ifd`].
 /// 
-/// This structure owns the list of Datablocks instead, so the user
-/// doesn't have to deal with the offsets in the file. It is responsible
-/// for allocating and writing both the offsets and the blocks of data.
+/// This structure owns a list of [`IfdChain`]s instead, so the user
+/// doesn't have to deal with the offsets in the file. Each [`IFD`] 
+/// value will point to the first element of each [`IfdChain`]. Each
+/// of those `Ifd`s will point to the next one in their chain (if they
+/// are not the last of their chain) and so on.
 /// 
-/// [`LONG`]:tiff_types/struct.LONG.html
-/// [`Datablock`]: trait.Datablock.html
+/// It is responsible for writing both the offsets and all the [`Ifd`]s.
+/// 
+/// [`LONG`]:tiff_type/struct.LONG.html
+/// [`IFD`]:tiff_type/struct.IFD.html
+/// [`Ifd`]: struct.Ifd.html
+/// [`IfdChain`]: struct.IfdChain.html
 pub struct OffsetsToIfds {
     pub data: Vec<IfdChain>,
 }
 impl OffsetsToIfds {
-    /// Creates a new `Offsets` instance from a vector of [`Datablock`]s.
+    /// Creates a new `OffsetsToIfds` instance from a vector of [`IfdChain`]s.
     /// 
-    /// [`Datablock`]: trait.Datablock.html
+    /// [`IfdChain`]: struct.IfdChain.html
     pub fn new(ifds: Vec<IfdChain>) -> Self {
         OffsetsToIfds {
             data: ifds,
@@ -835,7 +876,7 @@ impl FieldValues for OffsetsToIfds {
     }
 }
 
-/// Allocated form of `Offsets`
+/// Allocated form of `OffsetsToIfds`
 struct AllocatedOffsetsToIfds {
     position: Option<u32>,
     offsets: Vec<IFD>,
@@ -872,14 +913,14 @@ impl AllocatedFieldValues for AllocatedOffsetsToIfds {
     }
 }
 
-/// Represents a list of [`LONG`] values, each pointing to a specific 
+/// A list of [`LONG`] values, each pointing to a specific 
 /// [`Datablock`].
 /// 
 /// This structure owns the list of Datablocks instead, so the user
 /// doesn't have to deal with the offsets in the file. It is responsible
-/// for allocating and writing both the offsets and the blocks of data.
+/// for writing both the offsets and the blocks of data.
 /// 
-/// [`LONG`]:tiff_types/struct.LONG.html
+/// [`LONG`]:tiff_type/struct.LONG.html
 /// [`Datablock`]: trait.Datablock.html
 pub struct Offsets<T: Datablock> {
     pub data: Vec<T>,
@@ -894,18 +935,12 @@ impl<T: Datablock + 'static> Offsets<T> {
         }
     }
 
-    // /// Allocates a block and returns it with the number of bytes it allocated.
-    // fn allocate_block(block: T, c: &mut Cursor) -> (<T as Datablock>::Allocated, u32)  {
-    //     let cursor_initial = c.allocated_bytes();
-    //     let allocated_block = block.allocate(c);
-    //     let allocated_size = c.allocated_bytes() - cursor_initial;
-    //     // Internally allocate an extra byte if size is odd.
-    //     // This guarantes that the next element will
-    //     // begin on a word-boundary.
-    //     if allocated_size%2 == 1 { c.allocate(1); }
-
-    //     (allocated_block, allocated_size)
-    // }
+    /// Creates a new `Offsets` instance from a single [`Datablock`].
+    /// 
+    /// [`Datablock`]: trait.Datablock.html
+    pub fn single(datablock: T) -> Self {
+        Offsets::new(vec![datablock])
+    }
 }
 impl<T: Datablock + 'static> FieldValues for Offsets<T> {
     fn count(&self) -> u32 {
@@ -1016,7 +1051,17 @@ impl<T: Datablock> AllocatedFieldValues for AllocatedOffsets<T> {
 
 /// [`Datablock`] that consists of a list of bytes.
 /// 
-/// [`Datablock`]: trait.Datablock
+/// It is possible to store any block of data in a `ByteBlock`,
+/// but that would require to know the [`Endianness`] of the file
+/// beforehand, so the bytes are written in the correct order.
+/// 
+/// Using a [`Datablock`], on the other hand, allows to make use
+/// of the functionality of an [`EndianFile`], so the data can be
+/// written without worrying about the endianness.
+/// 
+/// [`Datablock`]: trait.Datablock.html
+/// [`EndianFile`]: struct.EndianFile.html
+/// [`Endianness`]: enum.Endianness.html
 pub struct ByteBlock(pub Vec<u8>);
 impl ByteBlock {
     /// Constructs an [`Offsets`] of `ByteBlock`s from a vector of
@@ -1027,6 +1072,15 @@ impl ByteBlock {
     /// [`Offsets`]: struct.Offsets.html
     pub fn offsets(blocks: Vec<Vec<u8>>) -> Offsets<ByteBlock> {
         Offsets::new(blocks.into_iter().map(|block| ByteBlock(block)).collect())
+    }
+
+    /// Constructs an [`Offsets`] from a vector of bytes.
+    /// 
+    /// This vector of bytes represents a single `ByteBlock`.
+    /// 
+    /// [`Offsets`]: struct.Offsets.html
+    pub fn single(block: Vec<u8>) -> Offsets<ByteBlock> {
+        ByteBlock::offsets(vec![block])
     }
 }
 impl Datablock for ByteBlock {
@@ -1042,13 +1096,17 @@ impl Datablock for ByteBlock {
     }
 }
 
-/// Represents a list of values of any given [`TiffType`].
+/// A list of values of any given [`TiffType`].
 /// 
 /// [`TiffType`]: tiff_type/trait.TiffType.html
 pub struct TiffTypeValues<T: TiffType> {
     values: Vec<T>,
 }
 impl<T: TiffType + 'static> TiffTypeValues<T> {
+    /// Creates a new instance of `TiffTypeValues` from a vector
+    /// of instances of any given [`TiffType`].
+    /// 
+    /// [`TiffType`]: tiff_type/trait.TiffType.html
     pub fn new(values: Vec<T>) -> Self {
         if values.len() == 0 {
             panic!("Cannot create an empty instance of TiffTypeValues")
@@ -1059,7 +1117,6 @@ impl<T: TiffType + 'static> TiffTypeValues<T> {
     }
 }
 impl<T: TiffType + 'static> FieldValues for TiffTypeValues<T> {
-    
     fn count(&self) -> u32 {
         self.values.len() as u32
     }

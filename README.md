@@ -1,6 +1,4 @@
-# tiff
-
-A crate for encoding TIFF files. Work in progress.
+A crate for encoding TIFF files with the desired IFDs and entries. 
 
 # Documentation
 

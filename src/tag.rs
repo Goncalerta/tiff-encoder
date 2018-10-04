@@ -1,4 +1,10 @@
-#[allow(non_upper_case_globals)]
+//! Constants for commonly used tags in TIFF files, baseline 
+//! or extended.
+//! 
+//! Check the [Tiff Tag Reference](https://www.awaresystems.be/imaging/tiff/tifftags.html)
+//! for more information on each tag.
+
+#![allow(non_upper_case_globals)]
 
 pub const NewSubfileType: u16 = 0x00FE;
 pub const SubfileType: u16 = 0x00FF;
