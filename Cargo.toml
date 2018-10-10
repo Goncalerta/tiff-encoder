@@ -4,7 +4,6 @@ version = "0.1.0"
 authors = ["PedroGonçaloCorreia <goncalerta@gmail.com>"]
 license = "MIT"
 description = "Rust library for creating TIFF files."
-documentation = "https://goncalerta.github.io/tiff-encoder/tiff_encoder/"
 homepage = "https://github.com/Goncalerta/tiff-encoder"
 repository = "https://github.com/Goncalerta/tiff-encoder"
 
