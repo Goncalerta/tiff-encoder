@@ -551,6 +551,9 @@ impl AllocatedIfdChain {
 /// A structure that holds both an IFD and all the values pointed at
 /// by its entries.
 /// 
+/// An image file directory (IFD) contains information about the image, as
+/// well as pointers to the actual image data (both stored as entries).
+/// 
 /// In a TIFF file, an IFD may point to another IFD with its last 4
 /// bytes. To abstract the user of this crate from the position of each
 /// structure in the file, this link between `Ifd`s is represented by
@@ -830,8 +833,49 @@ pub trait AllocatedFieldValues {
 /// of the functionality of an [`EndianFile`], so the data can be
 /// written without worrying about the endianness.
 /// 
+/// # Examples
+/// 
+/// Creating a DataBlock from a Vec<u32>: 
+/// ``` 
+/// use std::io;
+/// // Create a block that wraps the u32 data.
+/// struct U32Block(Vec<u32>);
+/// // Implement datablock functions
+/// impl Datablock for U32Block {
+///     fn size(&self) -> u32 {
+///         // Each u32 occupies 4 bytes.
+///         self.0.len() as u32 * 4
+///     }
+///     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
+///         for val in self.0 {
+///             file.write_u32(val)?
+///         }
+///         Ok(())
+///     }
+/// }
+/// // (Optional) implement some convenient functions to construct Offsets
+/// impl U32Block {
+///     // Construct an Offsets to multiple U32Block
+///     pub fn offsets(blocks: Vec<Vec<u32>>) -> Offsets<Self> {
+///         Offsets::new(blocks.into_iter().map(|block| U32Block(block)).collect())
+///     }
+///     // Construct an Offsets to a single U32Block
+///     pub fn single(block: Vec<u32>) -> Offsets<Self> {
+///         U32Block::offsets(vec![block])
+///     }
+/// }
+///
+/// // A vector holding arbitrary u32 data.
+/// // This is the data we want to store in the U32Block.
+/// let data_32bits: Vec<u32> = vec![0; 65536];
+///
+/// // This is the value that can be used directly as an IFD entry value.
+/// let byte_block = U32Block::single(data_32bits);
+/// ```
+/// 
 /// [`ByteBlock`]: struct.ByteBlock.html
 /// [`Endianness`]: enum.Endianness.html
+/// [`EndianFile`]: struct.EndianFile.html
 pub trait Datablock {
     /// The number of bytes occupied by this `Datablock`.
     /// 
@@ -1112,6 +1156,38 @@ impl<T: Datablock> AllocatedFieldValues for AllocatedOffsets<T> {
 /// Using a [`Datablock`], on the other hand, allows to make use
 /// of the functionality of an [`EndianFile`], so the data can be
 /// written without worrying about the endianness.
+/// 
+/// # Examples
+/// 
+/// Creating a ByteBlock from a Vec<u8>:
+/// ``` 
+/// // A vector holding arbitrary u8 data.
+/// // This is the data we want to store as a Byteblock.
+/// let data_8bits: Vec<u8> = vec![0; 65536];
+///
+/// // Create an Offsets of a single Byteblock from the buffer.
+/// // This is the value that can be used directly as an IFD entry value.
+/// let byte_block = ByteBlock::single(data_8bits);
+/// ```
+/// 
+/// Creating a ByteBlock from a Vec<u32>: 
+/// ``` 
+/// // A vector holding arbitrary u32 data.
+/// // This is the data we want to store as a Byteblock.
+/// let data_32bits: Vec<u32> = vec![0; 65536];
+///
+/// // First, let's store the data in a u8 buffer.
+/// // let mut image_bytes = Vec::with_capacity(262144); // 65536*4 (each u32 has a size of 4 bytes)
+/// for val in data_32bits {
+///     // A little endian TIFF file is assumed in this example.
+///     image_bytes.write_u32::<LittleEndian>(val).unwrap();
+/// }
+///
+/// // Create an Offsets of a single Byteblock from the buffer.
+/// // This is the value that can be used directly as an IFD entry value.
+/// let byte_block = ByteBlock::single(image_bytes);
+/// ```
+/// 
 /// 
 /// [`Datablock`]: trait.Datablock.html
 /// [`EndianFile`]: struct.EndianFile.html

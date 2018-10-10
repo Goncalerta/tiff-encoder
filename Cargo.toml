@@ -1,11 +1,12 @@
 [package]
 name = "tiff-encoder"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["PedroGonçaloCorreia <goncalerta@gmail.com>"]
 license = "MIT"
 description = "Rust library for creating TIFF files."
 homepage = "https://github.com/Goncalerta/tiff-encoder"
 repository = "https://github.com/Goncalerta/tiff-encoder"
+readme = "README.md"
 
 [dependencies]
 byteorder = "1.2.6"
