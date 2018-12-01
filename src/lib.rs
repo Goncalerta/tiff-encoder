@@ -58,6 +58,7 @@ pub mod tag;
 
 use std::fs;
 use std::io;
+use std::io::Write;
 use byteorder::{WriteBytesExt, LittleEndian, BigEndian};
 use std::collections::BTreeMap;
 use tiff_type::*;
@@ -111,6 +112,21 @@ impl EndianFile {
     pub fn write_u8(&mut self, n: u8) -> io::Result<()> {
         self.written_bytes += 1;
         self.file.write_u8(n)
+    }
+
+    /// Writes a slice of bytes to a file.
+    ///
+    /// This is much more efficient than calling [`write_u8`] in a loop if you have list
+    /// of bytes to write.
+    ///
+    /// # Errors
+    ///
+    /// This method returns the same errors as [`Write::write_all`].
+    ///
+    /// [`Write::write_all`]: https://doc.rust-lang.org/std/io/trait.Write.html#method.write_all
+    pub fn write_all_u8(&mut self, bytes: &[u8]) -> io::Result<()> {
+        self.written_bytes += bytes.len() as u32;
+        self.file.write_all(bytes)
     }
 
     /// Writes a u16 to the file.
@@ -1219,9 +1235,7 @@ impl Datablock for ByteBlock {
     }
     
     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
-        for byte in self.0 {
-            file.write_u8(byte)?;
-        }
+        file.write_all_u8(&self.0)?;
         Ok(())
     }
 }
