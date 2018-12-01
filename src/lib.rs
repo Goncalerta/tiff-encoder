@@ -835,7 +835,7 @@ pub trait AllocatedFieldValues {
 /// 
 /// # Examples
 /// 
-/// Creating a DataBlock from a Vec<u32>: 
+/// Creating a DataBlock for `Vec<u32>`: 
 /// ``` 
 /// use std::io;
 /// // Create a block that wraps the u32 data.
@@ -1159,7 +1159,7 @@ impl<T: Datablock> AllocatedFieldValues for AllocatedOffsets<T> {
 /// 
 /// # Examples
 /// 
-/// Creating a ByteBlock from a Vec<u8>:
+/// Creating a ByteBlock from a `Vec<u8>`:
 /// ``` 
 /// // A vector holding arbitrary u8 data.
 /// // This is the data we want to store as a Byteblock.
@@ -1170,7 +1170,7 @@ impl<T: Datablock> AllocatedFieldValues for AllocatedOffsets<T> {
 /// let byte_block = ByteBlock::single(data_8bits);
 /// ```
 /// 
-/// Creating a ByteBlock from a Vec<u32>: 
+/// Creating a ByteBlock from a `Vec<u32>`: 
 /// ``` 
 /// // A vector holding arbitrary u32 data.
 /// // This is the data we want to store as a Byteblock.
