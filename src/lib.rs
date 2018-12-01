@@ -854,6 +854,7 @@ pub trait AllocatedFieldValues {
 /// Creating a DataBlock for `Vec<u32>`: 
 /// ``` 
 /// use std::io;
+/// use tiff_encoder::*;
 /// // Create a block that wraps the u32 data.
 /// struct U32Block(Vec<u32>);
 /// // Implement datablock functions
@@ -1177,6 +1178,8 @@ impl<T: Datablock> AllocatedFieldValues for AllocatedOffsets<T> {
 /// 
 /// Creating a ByteBlock from a `Vec<u8>`:
 /// ``` 
+/// use tiff_encoder::*;
+/// 
 /// // A vector holding arbitrary u8 data.
 /// // This is the data we want to store as a Byteblock.
 /// let data_8bits: Vec<u8> = vec![0; 65536];
@@ -1187,13 +1190,19 @@ impl<T: Datablock> AllocatedFieldValues for AllocatedOffsets<T> {
 /// ```
 /// 
 /// Creating a ByteBlock from a `Vec<u32>`: 
-/// ``` 
+/// ``` extern crate byteorder;
+/// // Crate byteorder will be used to write 32-bit information in a 8-bit buffer.
+/// use byteorder::io::WriteBytesExt;
+/// 
+/// use tiff_encoder::*;
+/// 
+/// 
 /// // A vector holding arbitrary u32 data.
 /// // This is the data we want to store as a Byteblock.
 /// let data_32bits: Vec<u32> = vec![0; 65536];
 ///
 /// // First, let's store the data in a u8 buffer.
-/// // let mut image_bytes = Vec::with_capacity(262144); // 65536*4 (each u32 has a size of 4 bytes)
+/// let mut image_bytes = Vec::with_capacity(262144); // 65536*4 (each u32 has a size of 4 bytes)
 /// for val in data_32bits {
 ///     // A little endian TIFF file is assumed in this example.
 ///     image_bytes.write_u32::<LittleEndian>(val).unwrap();
