@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.1.2 - 2018-12-01
+
+### Performance
+
+* Increase performance when writing large files.
+
+### Documentation
+
+* Minor tweaks.
+* Fix failed documentation tests.
+
 ## 0.1.1 - 2018-10-10
 
 ### Documentation
