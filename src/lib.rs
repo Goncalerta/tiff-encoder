@@ -59,6 +59,7 @@ pub mod tag;
 use std::fs;
 use std::io;
 use std::io::Write;
+use std::path::Path;
 use byteorder::{WriteBytesExt, LittleEndian, BigEndian};
 use std::collections::BTreeMap;
 use tiff_type::*;
@@ -402,7 +403,7 @@ impl TiffFile {
     /// 
     /// This function will `panic` if the file trying to be written would exceed
     /// the maximum size of a TIFF file (2**32 bytes, or 4 GiB). 
-    pub fn write_to(self, file_path: &str) -> io::Result<fs::File> {
+    pub fn write_to<P: AsRef<Path>>(self, file_path: P) -> io::Result<fs::File> {
         let file = fs::File::create(file_path)?;
         // Writing to a file is comprised of two phases: the "Allocating Phase" 
         // and the "Writting Phase". During the first, all the components of the
