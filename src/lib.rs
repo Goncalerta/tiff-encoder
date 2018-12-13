@@ -404,6 +404,12 @@ impl TiffFile {
     /// This function will `panic` if the file trying to be written would exceed
     /// the maximum size of a TIFF file (2**32 bytes, or 4 GiB). 
     pub fn write_to<P: AsRef<Path>>(self, file_path: P) -> io::Result<fs::File> {
+        // Create all of the file's parent components if they are missing before
+        // trying to create the file itself.
+        if let Some(dir) = file_path.as_ref().parent() {
+            fs::create_dir_all(dir)?;
+        } 
+        
         let file = fs::File::create(file_path)?;
         // Writing to a file is comprised of two phases: the "Allocating Phase" 
         // and the "Writting Phase". During the first, all the components of the
