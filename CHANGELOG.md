@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.2.1 - 2018-12-13
+
+### Fix
+
+* If writing the file to a path that doesn't exist, automatically create all missing directories.
+
+## 0.2.0 - 2018-12-12
+
+### Feature
+
+* `TiffFile::write_to` can now be used with any type implementing `AsRef<Path>`, instead of being limited to `&str`.
+
 ## 0.1.2 - 2018-12-01
 
 ### Performance
