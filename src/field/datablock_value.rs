@@ -1,5 +1,8 @@
-use super::*;
+use std::io;
+
+use super::{AllocatedFieldValues, FieldValues};
 use tiff_type::{TiffType, LONG};
+use write::{Cursor, EndianFile};
 
 /// A block of data in the file pointed to by a field value, but
 /// that isn't part of the field itself (such as image strips).
@@ -26,7 +29,7 @@ use tiff_type::{TiffType, LONG};
 ///         // Each u32 occupies 4 bytes.
 ///         self.0.len() as u32 * 4
 ///     }
-///     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
+///     fn write_to(self, file: &mut write::EndianFile) -> io::Result<()> {
 ///         for val in self.0 {
 ///             file.write_u32(val)?
 ///         }
@@ -112,14 +115,17 @@ impl<T: Datablock + 'static> Offsets<T> {
     }
 }
 impl<T: Datablock + 'static> FieldValues for Offsets<T> {
+    #[doc(hidden)]
     fn count(&self) -> u32 {
         self.data.len() as u32
     }
 
+    #[doc(hidden)]
     fn size(&self) -> u32 {
         LONG::size() * self.count()
     }
 
+    #[doc(hidden)]
     fn allocate(self: Box<Self>, c: &mut Cursor) -> Box<AllocatedFieldValues> {
         let position = Some(c.allocated_bytes());
         if self.data.len() == 1 {

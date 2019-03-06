@@ -1,4 +1,4 @@
-//! Helpers to write the TIFF file.
+//! Helpers to write the file.
 
 use byteorder::{BigEndian, LittleEndian, WriteBytesExt};
 use std::fs;
@@ -67,7 +67,7 @@ impl Cursor {
     }
 }
 
-/// A helper structure that provides convenience methods to write to
+/// Helper structure that provides convenience methods to write to
 /// a `fs::File`, being aware of the file's [`Endianness`].
 ///
 /// [`Endianness`]: enum.Endianness.html

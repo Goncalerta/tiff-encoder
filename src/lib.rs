@@ -55,13 +55,12 @@ extern crate byteorder;
 
 pub mod tag;
 pub mod tiff_type;
+pub mod write;
 
 mod field;
 mod ifd;
 mod tiff_file;
-mod write;
 
 pub use field::*;
 pub use ifd::*;
 pub use tiff_file::*;
-pub use write::*;

@@ -1,5 +1,8 @@
-use super::*;
-use tiff_type::*;
+use std::io;
+
+use super::{AllocatedFieldValues, FieldValues};
+use tiff_type::TiffType;
+use write::{Cursor, EndianFile};
 
 /// A list of values of any given [`TiffType`].
 ///
@@ -20,14 +23,17 @@ impl<T: TiffType + 'static> TiffTypeValues<T> {
     }
 }
 impl<T: TiffType + 'static> FieldValues for TiffTypeValues<T> {
+    #[doc(hidden)]
     fn count(&self) -> u32 {
         self.values.len() as u32
     }
 
+    #[doc(hidden)]
     fn size(&self) -> u32 {
         T::size() * self.count()
     }
 
+    #[doc(hidden)]
     fn allocate(self: Box<Self>, c: &mut Cursor) -> Box<AllocatedFieldValues> {
         let position = if self.size() <= 4 {
             None

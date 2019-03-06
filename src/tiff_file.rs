@@ -1,7 +1,9 @@
-use super::*;
 use std::fs;
 use std::io;
 use std::path::Path;
+
+use write::{Cursor, EndianFile, Endianness};
+use {AllocatedIfdChain, IfdChain};
 
 /// Representation of a Tagged Image File.
 ///
@@ -59,7 +61,7 @@ impl TiffFile {
     ///     Ifd::new()
     ///         .with_entry(0x0000, BYTE::single(0))
     ///         .single()
-    /// ).with_endianness(Endianness::MM);
+    /// ).with_endianness(write::Endianness::MM);
     /// ```
     pub fn with_endianness(mut self, endian: Endianness) -> Self {
         self.header.byte_order = endian;

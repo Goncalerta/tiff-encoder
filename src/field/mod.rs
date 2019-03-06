@@ -1,7 +1,6 @@
-use Cursor;
-use EndianFile;
-
 use std::io;
+
+use write::{Cursor, EndianFile};
 
 mod datablock_value;
 mod ifd_value;
@@ -28,7 +27,7 @@ pub type FieldTag = u16;
 /// The third represents a list of [`IFD`] values, each pointing to
 /// an [`Ifd`].
 ///
-/// It is not possible to implement this trait manually outside of
+/// This trait is sealed. It is not possible to implement it outside
 /// this crate.
 ///
 /// [`TiffTypeValues`]: struct.TiffTypeValues.html

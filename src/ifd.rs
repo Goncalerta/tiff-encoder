@@ -1,8 +1,9 @@
-use super::*;
 use std::collections::BTreeMap;
 use std::io;
-use Cursor;
-use EndianFile;
+
+use tag;
+use write::{Cursor, EndianFile};
+use {AllocatedFieldValues, FieldTag, FieldValues, OffsetsToIfds};
 
 /// An ordered list of [`Ifd`]s, each pointing to the next one.
 ///

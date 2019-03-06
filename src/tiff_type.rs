@@ -8,8 +8,10 @@
 //!
 //! [`TiffType`]: trait.TiffType.html
 
-use super::*;
 use std::io;
+use write::EndianFile;
+
+use TiffTypeValues;
 
 /// A type of data for TIFF fields.
 ///

@@ -1,7 +1,9 @@
-use super::*;
+use std::io;
+
+use super::{AllocatedFieldValues, FieldValues};
 use tiff_type::{TiffType, IFD};
-use AllocatedIfdChain;
-use IfdChain;
+use write::{Cursor, EndianFile};
+use {AllocatedIfdChain, IfdChain};
 
 /// A list of [`IFD`] values, each pointing to a specific
 /// [`Ifd`].
@@ -30,14 +32,17 @@ impl OffsetsToIfds {
     }
 }
 impl FieldValues for OffsetsToIfds {
+    #[doc(hidden)]
     fn count(&self) -> u32 {
         self.data.len() as u32
     }
 
+    #[doc(hidden)]
     fn size(&self) -> u32 {
         IFD::size() * self.count()
     }
 
+    #[doc(hidden)]
     fn allocate(self: Box<Self>, c: &mut Cursor) -> Box<AllocatedFieldValues> {
         let position = Some(c.allocated_bytes());
         if self.data.len() == 1 {
