@@ -1,6 +1,6 @@
-//! Constants for commonly used tags in TIFF files, baseline 
+//! Constants for commonly used tags in TIFF files, baseline
 //! or extended.
-//! 
+//!
 //! Check the [Tiff Tag Reference](https://www.awaresystems.be/imaging/tiff/tifftags.html)
 //! for more information on each tag.
 
