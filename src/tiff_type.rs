@@ -9,6 +9,7 @@
 //! [`TiffType`]: trait.TiffType.html
 
 use super::*;
+use std::io;
 
 /// A type of data for TIFF fields.
 ///
