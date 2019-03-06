@@ -1,7 +1,8 @@
+use super::*;
 use std::collections::BTreeMap;
+use std::io;
 use Cursor;
 use EndianFile;
-use super::*;
 
 /// An ordered list of [`Ifd`]s, each pointing to the next one.
 ///
