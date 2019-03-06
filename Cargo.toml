@@ -9,4 +9,4 @@ repository = "https://github.com/Goncalerta/tiff-encoder"
 readme = "README.md"
 
 [dependencies]
-byteorder = "1.2.6"
+byteorder = "1.3.1"
