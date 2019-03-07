@@ -27,18 +27,18 @@
 //!
 //! TiffFile::new(
 //!     Ifd::new()
-//!         .with_entry(tag::PhotometricInterpretation, SHORT::single(1)) // Black is zero
-//!         .with_entry(tag::Compression, SHORT::single(1)) // No compression
+//!         .with_entry(tag::PhotometricInterpretation, SHORT![1]) // Black is zero
+//!         .with_entry(tag::Compression, SHORT![1]) // No compression
 //!
-//!         .with_entry(tag::ImageLength, LONG::single(256))
-//!         .with_entry(tag::ImageWidth, LONG::single(256))
+//!         .with_entry(tag::ImageLength, LONG![256])
+//!         .with_entry(tag::ImageWidth, LONG![256])
 //!
-//!         .with_entry(tag::ResolutionUnit, SHORT::single(1)) // No resolution unit
-//!         .with_entry(tag::XResolution, RATIONAL::single(1, 1))
-//!         .with_entry(tag::YResolution, RATIONAL::single(1, 1))
+//!         .with_entry(tag::ResolutionUnit, SHORT![1]) // No resolution unit
+//!         .with_entry(tag::XResolution, RATIONAL![(1, 1)])
+//!         .with_entry(tag::YResolution, RATIONAL![(1, 1)])
 //!
-//!         .with_entry(tag::RowsPerStrip, LONG::single(256)) // One strip for the whole image
-//!         .with_entry(tag::StripByteCounts, LONG::single(8192))
+//!         .with_entry(tag::RowsPerStrip, LONG![256]) // One strip for the whole image
+//!         .with_entry(tag::StripByteCounts, LONG![8192])
 //!         .with_entry(tag::StripOffsets, ByteBlock::single(image_data))
 //!         .single() // This is the only Ifd in its IfdChain
 //! ).write_to("example.tif").unwrap();

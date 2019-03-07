@@ -29,7 +29,7 @@ impl TiffFile {
     /// use tiff_encoder::tiff_type::*;
     /// let tiff_file = TiffFile::new(
     ///     Ifd::new()
-    ///         .with_entry(0x0000, BYTE::single(0))
+    ///         .with_entry(0x0000, BYTE![0])
     ///         .single()
     /// );
     /// ```
@@ -56,10 +56,10 @@ impl TiffFile {
     /// ```
     /// use tiff_encoder::*;
     /// use tiff_encoder::tiff_type::*;
-    ///
+    /// 
     /// let tiff_file = TiffFile::new(
     ///     Ifd::new()
-    ///         .with_entry(0x0000, BYTE::single(0))
+    ///         .with_entry(0x0000, BYTE![0])
     ///         .single()
     /// ).with_endianness(write::Endianness::MM);
     /// ```
@@ -82,7 +82,7 @@ impl TiffFile {
     ///
     /// let file = TiffFile::new(
     ///     Ifd::new()
-    ///         .with_entry(0x0000, BYTE::single(0))
+    ///         .with_entry(0x0000, BYTE![0])
     ///         .single()
     /// ).write_to("file.tif").unwrap();
     /// ```

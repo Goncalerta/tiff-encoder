@@ -132,11 +132,11 @@ impl Ifd {
     /// use tiff_encoder::tiff_type::*;
     ///
     /// let ifd = Ifd::new()
-    ///     .with_entry(0x0000, BYTE::single(0))
-    ///     .with_entry(0x00FF, LONG::single(500))
-    ///     .with_entry(0xA01F, SHORT::values(vec![50, 2, 0, 3]))
-    ///     .with_entry(0x0005, ASCII::from_str("Hello TIFF!"))
-    ///     .with_entry(0x0100, UNDEFINED::values(vec![0x42, 0x42, 0x42, 0x42]));
+    ///     .with_entry(0x0000, BYTE![0])
+    ///     .with_entry(0x00FF, LONG![500])
+    ///     .with_entry(0xA01F, SHORT![50, 2, 0, 3])
+    ///     .with_entry(0x0005, ASCII!["Hello TIFF!"])
+    ///     .with_entry(0x0100, UNDEFINED![0x42, 0x42, 0x42, 0x42]);
     /// ```
     ///
     /// # Panics

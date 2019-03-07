@@ -9,8 +9,8 @@
 //! [`TiffType`]: trait.TiffType.html
 
 use std::io;
-use write::EndianFile;
 
+use write::EndianFile;
 use TiffTypeValues;
 
 /// A type of data for TIFF fields.
@@ -67,6 +67,12 @@ impl TiffType for BYTE {
     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
         file.write_u8(self.0)
     }
+}
+#[macro_export]
+macro_rules! BYTE {
+    ($($values: expr),+) => {
+        TiffTypeValues::new(vec![$(BYTE($values)),+])
+    };
 }
 
 /// 8-bit byte that contains a 7-bit ASCII code.
@@ -133,6 +139,13 @@ impl TiffType for ASCII {
         file.write_u8(self.0)
     }
 }
+// Only for consistency; does the same as ASCII::from_str
+#[macro_export]
+macro_rules! ASCII {
+    ($string: expr) => {
+        ASCII::from_str($string)
+    };
+}
 
 /// 16-bit (2-byte) unsigned integer.
 pub struct SHORT(pub u16);
@@ -166,6 +179,12 @@ impl TiffType for SHORT {
         file.write_u16(self.0)
     }
 }
+#[macro_export]
+macro_rules! SHORT {
+    ($($values: expr),+) => {
+        TiffTypeValues::new(vec![$(SHORT($values)),+])
+    };
+}
 
 /// 32-bit (4-byte) unsigned integer.
 pub struct LONG(pub u32);
@@ -198,6 +217,12 @@ impl TiffType for LONG {
     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
         file.write_u32(self.0)
     }
+}
+#[macro_export]
+macro_rules! LONG {
+    ($($values: expr),+) => {
+        TiffTypeValues::new(vec![$(LONG($values)),+])
+    };
 }
 
 /// Two LONGs representing, respectively, the numerator and the denominator of a fraction.
@@ -249,6 +274,12 @@ impl TiffType for RATIONAL {
         Ok(())
     }
 }
+#[macro_export]
+macro_rules! RATIONAL {
+    ($(($num: expr, $den: expr)),+) => {
+        TiffTypeValues::new(vec![$(RATIONAL{numerator: $num, denominator: $den}),+])
+    };
+}
 
 /// 8-bit signed (twos-complement) integer.
 pub struct SBYTE(pub i8);
@@ -281,6 +312,12 @@ impl TiffType for SBYTE {
         file.write_i8(self.0)
     }
 }
+#[macro_export]
+macro_rules! SBYTE {
+    ($($values: expr),+) => {
+        TiffTypeValues::new(vec![$(SBYTE($values)),+])
+    };
+}
 
 /// 8-bit byte that may contain anything, depending on the definition of the field.
 pub struct UNDEFINED(pub u8);
@@ -312,6 +349,12 @@ impl TiffType for UNDEFINED {
     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
         file.write_u8(self.0)
     }
+}
+#[macro_export]
+macro_rules! UNDEFINED {
+    ($($values: expr),+) => {
+        TiffTypeValues::new(vec![$(UNDEFINED($values)),+])
+    };
 }
 
 /// 16-bit (2-byte) signed (twos-complement) integer.
@@ -346,6 +389,12 @@ impl TiffType for SSHORT {
         file.write_i16(self.0)
     }
 }
+#[macro_export]
+macro_rules! SSHORT {
+    ($($values: expr),+) => {
+        TiffTypeValues::new(vec![$(SSHORT($values)),+])
+    };
+}
 
 /// 32-bit (4-byte) signed (twos-complement) integer.
 pub struct SLONG(pub i32);
@@ -378,6 +427,12 @@ impl TiffType for SLONG {
     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
         file.write_i32(self.0)
     }
+}
+#[macro_export]
+macro_rules! SLONG {
+    ($($values: expr),+) => {
+        TiffTypeValues::new(vec![$(SLONG($values)),+])
+    };
 }
 
 /// Two SLONGs representing, respectively, the numerator and the denominator of a fraction.
@@ -429,6 +484,12 @@ impl TiffType for SRATIONAL {
         Ok(())
     }
 }
+#[macro_export]
+macro_rules! SRATIONAL {
+    ($(($num: expr, $den: expr)),+) => {
+        TiffTypeValues::new(vec![$(SRATIONAL{numerator: $num, denominator: $den}),+])
+    };
+}
 
 /// Single precision (4-byte) IEEE format.
 pub struct FLOAT(pub f32);
@@ -462,6 +523,12 @@ impl TiffType for FLOAT {
         file.write_f32(self.0)
     }
 }
+#[macro_export]
+macro_rules! FLOAT {
+    ($($values: expr),+) => {
+        TiffTypeValues::new(vec![$(FLOAT($values)),+])
+    };
+}
 
 /// Double precision (8-byte) IEEE format.
 pub struct DOUBLE(pub f64);
@@ -493,6 +560,12 @@ impl TiffType for DOUBLE {
     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
         file.write_f64(self.0)
     }
+}
+#[macro_export]
+macro_rules! DOUBLE {
+    ($($values: expr),+) => {
+        TiffTypeValues::new(vec![$(DOUBLE($values)),+])
+    };
 }
 
 /// 32-bit (4-byte) unsigned integer used exclusively to point to IFDs.
