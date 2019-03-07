@@ -497,10 +497,10 @@ impl TiffType for DOUBLE {
 
 /// 32-bit (4-byte) unsigned integer used exclusively to point to IFDs.
 ///
-/// See [`OffsetsToIfds`]
+/// This type is not supposed to be used directly. See [`OffsetsToIfds`].
 ///
 /// [`OffsetsToIfds`]: ../struct.OffsetsToIfds.html
-pub struct IFD(pub u32);
+pub struct IFD(pub(crate) u32);
 impl TiffType for IFD {
     fn id() -> u16 {
         13
