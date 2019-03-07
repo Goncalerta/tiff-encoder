@@ -1,9 +1,9 @@
 use std::io;
 
 use super::{AllocatedFieldValues, FieldValues};
-use tiff_type::{TiffType, IFD};
-use write::{Cursor, EndianFile};
-use {AllocatedIfdChain, IfdChain};
+use crate::tiff_type::{TiffType, IFD};
+use crate::write::{Cursor, EndianFile};
+use crate::{AllocatedIfdChain, IfdChain};
 
 /// A list of [`IFD`] values, each pointing to a specific
 /// [`Ifd`].

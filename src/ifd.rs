@@ -1,9 +1,9 @@
 use std::collections::BTreeMap;
 use std::io;
 
-use tag;
-use write::{Cursor, EndianFile};
-use {AllocatedFieldValues, FieldTag, FieldValues, OffsetsToIfds};
+use crate::tag;
+use crate::write::{Cursor, EndianFile};
+use crate::{AllocatedFieldValues, FieldTag, FieldValues, OffsetsToIfds};
 
 /// An ordered list of [`Ifd`]s, each pointing to the next one.
 ///

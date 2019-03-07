@@ -1,8 +1,8 @@
 use std::io;
 
 use super::{AllocatedFieldValues, FieldValues};
-use tiff_type::TiffType;
-use write::{Cursor, EndianFile};
+use crate::tiff_type::TiffType;
+use crate::write::{Cursor, EndianFile};
 
 /// A list of values of any given [`TiffType`].
 ///
@@ -80,7 +80,7 @@ impl<T: TiffType> AllocatedFieldValues for AllocatedTiffTypeValues<T> {
         for value in self.values {
             let file_initial = file.written_bytes();
             value.write_to(file)?;
-            let mut written_size = file.written_bytes() - file_initial;
+            let written_size = file.written_bytes() - file_initial;
             if written_size != T::size() {
                 panic!(
                     "The size indicated ({}) is different from the number of bytes the type has written to the file ({}).", 

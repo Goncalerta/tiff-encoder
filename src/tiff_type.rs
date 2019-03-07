@@ -10,8 +10,8 @@
 
 use std::io;
 
-use write::EndianFile;
-use TiffTypeValues;
+use crate::write::EndianFile;
+use crate::TiffTypeValues;
 
 /// A type of data for TIFF fields.
 ///

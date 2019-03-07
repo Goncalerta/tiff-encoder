@@ -1,8 +1,8 @@
 use std::io;
 
 use super::{AllocatedFieldValues, FieldValues};
-use tiff_type::{TiffType, LONG};
-use write::{Cursor, EndianFile};
+use crate::tiff_type::{TiffType, LONG};
+use crate::write::{Cursor, EndianFile};
 
 /// A block of data in the file pointed to by a field value, but
 /// that isn't part of the field itself (such as image strips).
@@ -203,7 +203,7 @@ impl<T: Datablock> AllocatedFieldValues for AllocatedOffsets<T> {
             let file_initial = file.written_bytes();
             let block_size = block.size();
             block.write_to(file)?;
-            let mut written_size = file.written_bytes() - file_initial;
+            let written_size = file.written_bytes() - file_initial;
             // Internally write an extra byte if size is odd.
             // This guarantes that the next element will
             // begin on a word-boundary.

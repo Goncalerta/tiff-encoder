@@ -1,6 +1,7 @@
 [package]
 name = "tiff-encoder"
 version = "0.2.1"
+edition = "2018"
 authors = ["PedroGonçaloCorreia <goncalerta@gmail.com>"]
 license = "MIT"
 description = "Rust library for creating TIFF files."

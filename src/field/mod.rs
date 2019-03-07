@@ -1,6 +1,6 @@
 use std::io;
 
-use write::{Cursor, EndianFile};
+use crate::write::{Cursor, EndianFile};
 
 mod datablock_value;
 mod ifd_value;
@@ -76,7 +76,7 @@ pub trait AllocatedFieldValues {
 /// the crate. There are only three types of FieldValues:
 /// `Offsets` to datablocks, `OffsetsToIfds` and `TiffTypeValues`.
 mod private {
-    use tiff_type::TiffType;
+    use crate::tiff_type::TiffType;
 
     pub trait Sealed {}
     impl<T: super::Datablock> Sealed for super::Offsets<T> {}
