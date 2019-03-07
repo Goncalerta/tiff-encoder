@@ -72,7 +72,7 @@ impl TiffType for BYTE {
 #[macro_export]
 macro_rules! BYTE {
     ($($values: expr),+) => {
-        TiffTypeValues::new(vec![$(BYTE($values)),+])
+        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::BYTE($values)),+])
     };
 }
 
@@ -148,7 +148,7 @@ impl TiffType for ASCII {
 #[macro_export]
 macro_rules! ASCII {
     ($string: expr) => {
-        ASCII::from_str($string)
+        ::tiff_encoder::tiff_type::ASCII::from_str($string)
     };
 }
 
@@ -187,7 +187,7 @@ impl TiffType for SHORT {
 #[macro_export]
 macro_rules! SHORT {
     ($($values: expr),+) => {
-        TiffTypeValues::new(vec![$(SHORT($values)),+])
+        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::SHORT($values)),+])
     };
 }
 
@@ -226,7 +226,7 @@ impl TiffType for LONG {
 #[macro_export]
 macro_rules! LONG {
     ($($values: expr),+) => {
-        TiffTypeValues::new(vec![$(LONG($values)),+])
+        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::LONG($values)),+])
     };
 }
 
@@ -282,7 +282,7 @@ impl TiffType for RATIONAL {
 #[macro_export]
 macro_rules! RATIONAL {
     ($(($num: expr, $den: expr)),+) => {
-        TiffTypeValues::new(vec![$(RATIONAL{numerator: $num, denominator: $den}),+])
+        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::RATIONAL{numerator: $num, denominator: $den}),+])
     };
 }
 
@@ -320,7 +320,7 @@ impl TiffType for SBYTE {
 #[macro_export]
 macro_rules! SBYTE {
     ($($values: expr),+) => {
-        TiffTypeValues::new(vec![$(SBYTE($values)),+])
+        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::SBYTE($values)),+])
     };
 }
 
@@ -358,7 +358,7 @@ impl TiffType for UNDEFINED {
 #[macro_export]
 macro_rules! UNDEFINED {
     ($($values: expr),+) => {
-        TiffTypeValues::new(vec![$(UNDEFINED($values)),+])
+        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::UNDEFINED($values)),+])
     };
 }
 
@@ -397,7 +397,7 @@ impl TiffType for SSHORT {
 #[macro_export]
 macro_rules! SSHORT {
     ($($values: expr),+) => {
-        TiffTypeValues::new(vec![$(SSHORT($values)),+])
+        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::SSHORT($values)),+])
     };
 }
 
@@ -436,7 +436,7 @@ impl TiffType for SLONG {
 #[macro_export]
 macro_rules! SLONG {
     ($($values: expr),+) => {
-        TiffTypeValues::new(vec![$(SLONG($values)),+])
+        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::SLONG($values)),+])
     };
 }
 
@@ -492,7 +492,7 @@ impl TiffType for SRATIONAL {
 #[macro_export]
 macro_rules! SRATIONAL {
     ($(($num: expr, $den: expr)),+) => {
-        TiffTypeValues::new(vec![$(SRATIONAL{numerator: $num, denominator: $den}),+])
+        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::SRATIONAL{numerator: $num, denominator: $den}),+])
     };
 }
 
@@ -531,7 +531,7 @@ impl TiffType for FLOAT {
 #[macro_export]
 macro_rules! FLOAT {
     ($($values: expr),+) => {
-        TiffTypeValues::new(vec![$(FLOAT($values)),+])
+        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::FLOAT($values)),+])
     };
 }
 
@@ -569,7 +569,7 @@ impl TiffType for DOUBLE {
 #[macro_export]
 macro_rules! DOUBLE {
     ($($values: expr),+) => {
-        TiffTypeValues::new(vec![$(DOUBLE($values)),+])
+        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::DOUBLE($values)),+])
     };
 }
 
