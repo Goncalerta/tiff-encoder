@@ -56,7 +56,7 @@ impl TiffFile {
     /// ```
     /// use tiff_encoder::*;
     /// use tiff_encoder::tiff_type::*;
-    /// 
+    ///
     /// let tiff_file = TiffFile::new(
     ///     Ifd::new()
     ///         .with_entry(0x0000, BYTE![0])

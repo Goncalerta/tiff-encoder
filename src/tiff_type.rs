@@ -9,6 +9,7 @@
 //! [`TiffType`]: trait.TiffType.html
 
 use std::io;
+use std::convert::AsRef;
 
 use crate::write::EndianFile;
 use crate::TiffTypeValues;
@@ -44,8 +45,8 @@ impl BYTE {
     /// bytes.
     ///
     /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
-    pub fn values(values: Vec<u8>) -> TiffTypeValues<BYTE> {
-        TiffTypeValues::new(values.into_iter().map(|value| BYTE(value)).collect())
+    pub fn values<T: AsRef<[u8]>>(values: T) -> TiffTypeValues<BYTE> {
+        TiffTypeValues::new(values.as_ref().iter().map(|&value| BYTE(value)).collect())
     }
     /// Constructs a [`TiffTypeValues`] consisting of a single `BYTE`.
     ///
@@ -104,16 +105,20 @@ impl ASCII {
     /// be added automatically after the last value.
     ///
     /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
-    pub fn values(mut values: Vec<u8>) -> TiffTypeValues<ASCII> {
+    pub fn values<T: AsRef<[u8]>>(values: T) -> TiffTypeValues<ASCII> {
+        let values = values.as_ref();
         if values.len() == 0 {
             panic!("Cannot create an empty instance of TiffTypeValues.")
         }
-        if *values.last().unwrap() != 0 {
-            // TIFF ASCIIs must end with a NUL character.
-            // If the user doesn't add it, add it automatically.
-            values.push(0);
+
+        // TIFF ASCIIs must end with a NUL character.
+        // If the user doesn't add it, add it automatically.
+        let add_nul = *values.last().unwrap() != 0;
+        let mut values: Vec<_> = values.iter().map(|&value| ASCII::new(value)).collect();
+        if add_nul {
+            values.push(ASCII::new(0))
         }
-        TiffTypeValues::new(values.into_iter().map(|value| ASCII::new(value)).collect())
+        TiffTypeValues::new(values)
     }
     /// Creates an `ASCII`s value from a byte.
     ///
@@ -154,8 +159,8 @@ impl SHORT {
     /// `u16`.
     ///
     /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
-    pub fn values(values: Vec<u16>) -> TiffTypeValues<SHORT> {
-        TiffTypeValues::new(values.into_iter().map(|value| SHORT(value)).collect())
+    pub fn values<T: AsRef<[u16]>>(values: T) -> TiffTypeValues<SHORT> {
+        TiffTypeValues::new(values.as_ref().iter().map(|&value| SHORT(value)).collect())
     }
 
     /// Constructs a [`TiffTypeValues`] consisting of a single `SHORT`.
@@ -193,8 +198,8 @@ impl LONG {
     /// `u32`.
     ///
     /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
-    pub fn values(values: Vec<u32>) -> TiffTypeValues<LONG> {
-        TiffTypeValues::new(values.into_iter().map(|value| LONG(value)).collect())
+    pub fn values<T: AsRef<[u32]>>(values: T) -> TiffTypeValues<LONG> {
+        TiffTypeValues::new(values.as_ref().iter().map(|&value| LONG(value)).collect())
     }
 
     /// Constructs a [`TiffTypeValues`] consisting of a single `LONG`.
@@ -235,11 +240,11 @@ impl RATIONAL {
     /// pairs (numerator, denominator). Both must be `u32` values.
     ///
     /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
-    pub fn values(values: Vec<(u32, u32)>) -> TiffTypeValues<RATIONAL> {
+    pub fn values<T: AsRef<[(u32, u32)]>>(values: T) -> TiffTypeValues<RATIONAL> {
         TiffTypeValues::new(
             values
-                .into_iter()
-                .map(|(numerator, denominator)| RATIONAL {
+                .as_ref().iter()
+                .map(|&(numerator, denominator)| RATIONAL {
                     numerator,
                     denominator,
                 })
@@ -288,8 +293,8 @@ impl SBYTE {
     /// `i8`.
     ///
     /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
-    pub fn values(values: Vec<i8>) -> TiffTypeValues<SBYTE> {
-        TiffTypeValues::new(values.into_iter().map(|value| SBYTE(value)).collect())
+    pub fn values<T: AsRef<[i8]>>(values: T) -> TiffTypeValues<SBYTE> {
+        TiffTypeValues::new(values.as_ref().iter().map(|&value| SBYTE(value)).collect())
     }
     /// Constructs a [`TiffTypeValues`] consisting of a single `SBYTE`.
     ///
@@ -326,8 +331,8 @@ impl UNDEFINED {
     /// bytes.
     ///
     /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
-    pub fn values(values: Vec<u8>) -> TiffTypeValues<UNDEFINED> {
-        TiffTypeValues::new(values.into_iter().map(|value| UNDEFINED(value)).collect())
+    pub fn values<T: AsRef<[u8]>>(values: T) -> TiffTypeValues<UNDEFINED> {
+        TiffTypeValues::new(values.as_ref().iter().map(|&value| UNDEFINED(value)).collect())
     }
     /// Constructs a [`TiffTypeValues`] consisting of a single `UNDEFINED`.
     ///
@@ -364,8 +369,8 @@ impl SSHORT {
     /// `i16`.
     ///
     /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
-    pub fn values(values: Vec<i16>) -> TiffTypeValues<SSHORT> {
-        TiffTypeValues::new(values.into_iter().map(|value| SSHORT(value)).collect())
+    pub fn values<T: AsRef<[i16]>>(values: T) -> TiffTypeValues<SSHORT> {
+        TiffTypeValues::new(values.as_ref().iter().map(|&value| SSHORT(value)).collect())
     }
 
     /// Constructs a [`TiffTypeValues`] consisting of a single `SSHORT`.
@@ -403,8 +408,8 @@ impl SLONG {
     /// `i32`.
     ///
     /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
-    pub fn values(values: Vec<i32>) -> TiffTypeValues<SLONG> {
-        TiffTypeValues::new(values.into_iter().map(|value| SLONG(value)).collect())
+    pub fn values<T: AsRef<[i32]>>(values: T) -> TiffTypeValues<SLONG> {
+        TiffTypeValues::new(values.as_ref().iter().map(|&value| SLONG(value)).collect())
     }
 
     /// Constructs a [`TiffTypeValues`] consisting of a single `SLONG`.
@@ -445,11 +450,11 @@ impl SRATIONAL {
     /// pairs (numerator, denominator). Both must be `i32` values.
     ///
     /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
-    pub fn values(values: Vec<(i32, i32)>) -> TiffTypeValues<SRATIONAL> {
+    pub fn values<T: AsRef<[(i32, i32)]>>(values: T) -> TiffTypeValues<SRATIONAL> {
         TiffTypeValues::new(
             values
-                .into_iter()
-                .map(|(numerator, denominator)| SRATIONAL {
+                .as_ref().iter()
+                .map(|&(numerator, denominator)| SRATIONAL {
                     numerator,
                     denominator,
                 })
@@ -498,8 +503,8 @@ impl FLOAT {
     /// `f32`.
     ///
     /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
-    pub fn values(values: Vec<f32>) -> TiffTypeValues<FLOAT> {
-        TiffTypeValues::new(values.into_iter().map(|value| FLOAT(value)).collect())
+    pub fn values<T: AsRef<[f32]>>(values: T) -> TiffTypeValues<FLOAT> {
+        TiffTypeValues::new(values.as_ref().iter().map(|&value| FLOAT(value)).collect())
     }
 
     /// Constructs a [`TiffTypeValues`] consisting of a single `FLOAT`.
@@ -537,8 +542,8 @@ impl DOUBLE {
     /// `f64`.
     ///
     /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
-    pub fn values(values: Vec<f64>) -> TiffTypeValues<DOUBLE> {
-        TiffTypeValues::new(values.into_iter().map(|value| DOUBLE(value)).collect())
+    pub fn values<T: AsRef<[f64]>>(values: T) -> TiffTypeValues<DOUBLE> {
+        TiffTypeValues::new(values.as_ref().iter().map(|&value| DOUBLE(value)).collect())
     }
     /// Constructs a [`TiffTypeValues`] consisting of a single `DOUBLE`.
     ///
