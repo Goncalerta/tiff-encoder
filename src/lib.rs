@@ -58,3 +58,10 @@ pub mod write;
 
 mod file;
 pub use file::TiffFile;
+
+pub mod prelude {
+   pub use crate::TiffFile;
+   pub use crate::write::ByteBlock;
+   pub use crate::ifd::Ifd;
+   pub use crate::ifd::IfdChain;
+}
