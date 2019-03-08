@@ -3,8 +3,10 @@
 //!
 //! Check the [Tiff Tag Reference](https://www.awaresystems.be/imaging/tiff/tifftags.html)
 //! for more information on each tag.
-
 #![allow(non_upper_case_globals)]
+
+/// 16-bit identifier of a field entry.
+pub type FieldTag = u16;
 
 pub const NewSubfileType: u16 = 0x00FE;
 pub const SubfileType: u16 = 0x00FF;

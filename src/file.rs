@@ -2,8 +2,8 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
+use crate::ifd::{AllocatedIfdChain, IfdChain};
 use crate::write::{Cursor, EndianFile, Endianness};
-use crate::{AllocatedIfdChain, IfdChain};
 
 /// Representation of a Tagged Image File.
 ///

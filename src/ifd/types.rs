@@ -8,11 +8,11 @@
 //!
 //! [`TiffType`]: trait.TiffType.html
 
-use std::io;
 use std::convert::AsRef;
+use std::io;
 
+use crate::ifd::values::TiffTypeValues;
 use crate::write::EndianFile;
-use crate::TiffTypeValues;
 
 /// A type of data for TIFF fields.
 ///
@@ -243,7 +243,8 @@ impl RATIONAL {
     pub fn values<T: AsRef<[(u32, u32)]>>(values: T) -> TiffTypeValues<RATIONAL> {
         TiffTypeValues::new(
             values
-                .as_ref().iter()
+                .as_ref()
+                .iter()
                 .map(|&(numerator, denominator)| RATIONAL {
                     numerator,
                     denominator,
@@ -332,7 +333,13 @@ impl UNDEFINED {
     ///
     /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
     pub fn values<T: AsRef<[u8]>>(values: T) -> TiffTypeValues<UNDEFINED> {
-        TiffTypeValues::new(values.as_ref().iter().map(|&value| UNDEFINED(value)).collect())
+        TiffTypeValues::new(
+            values
+                .as_ref()
+                .iter()
+                .map(|&value| UNDEFINED(value))
+                .collect(),
+        )
     }
     /// Constructs a [`TiffTypeValues`] consisting of a single `UNDEFINED`.
     ///
@@ -453,7 +460,8 @@ impl SRATIONAL {
     pub fn values<T: AsRef<[(i32, i32)]>>(values: T) -> TiffTypeValues<SRATIONAL> {
         TiffTypeValues::new(
             values
-                .as_ref().iter()
+                .as_ref()
+                .iter()
                 .map(|&(numerator, denominator)| SRATIONAL {
                     numerator,
                     denominator,

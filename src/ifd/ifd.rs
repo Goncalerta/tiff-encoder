@@ -1,9 +1,9 @@
 use std::collections::BTreeMap;
 use std::io;
 
-use crate::tag;
+use crate::ifd::tags::{self, FieldTag};
+use crate::ifd::values::{AllocatedFieldValues, FieldValues, OffsetsToIfds};
 use crate::write::{Cursor, EndianFile};
-use crate::{AllocatedFieldValues, FieldTag, FieldValues, OffsetsToIfds};
 
 /// An ordered list of [`Ifd`]s, each pointing to the next one.
 ///
@@ -170,7 +170,7 @@ impl Ifd {
     ///
     /// [`TiffFile`]: struct.TiffFile.html
     pub fn with_subifds(self, subifds: Vec<IfdChain>) -> Self {
-        self.with_entry(tag::SubIFDs, OffsetsToIfds::new(subifds))
+        self.with_entry(tags::SubIFDs, OffsetsToIfds::new(subifds))
     }
 
     /// Returns an [`IfdChain`] containing solely this `Ifd`.
