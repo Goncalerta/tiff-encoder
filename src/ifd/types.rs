@@ -72,7 +72,7 @@ impl TiffType for BYTE {
 #[macro_export]
 macro_rules! BYTE {
     ($($values: expr),+) => {
-        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::BYTE($values)),+])
+        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::BYTE($values)),+])
     };
 }
 
@@ -148,7 +148,7 @@ impl TiffType for ASCII {
 #[macro_export]
 macro_rules! ASCII {
     ($string: expr) => {
-        ::tiff_encoder::tiff_type::ASCII::from_str($string)
+        ::tiff_encoder::ifd::types::ASCII::from_str($string)
     };
 }
 
@@ -187,7 +187,7 @@ impl TiffType for SHORT {
 #[macro_export]
 macro_rules! SHORT {
     ($($values: expr),+) => {
-        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::SHORT($values)),+])
+        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::SHORT($values)),+])
     };
 }
 
@@ -226,7 +226,7 @@ impl TiffType for LONG {
 #[macro_export]
 macro_rules! LONG {
     ($($values: expr),+) => {
-        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::LONG($values)),+])
+        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::LONG($values)),+])
     };
 }
 
@@ -283,7 +283,7 @@ impl TiffType for RATIONAL {
 #[macro_export]
 macro_rules! RATIONAL {
     ($(($num: expr, $den: expr)),+) => {
-        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::RATIONAL{numerator: $num, denominator: $den}),+])
+        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::RATIONAL{numerator: $num, denominator: $den}),+])
     };
 }
 
@@ -321,7 +321,7 @@ impl TiffType for SBYTE {
 #[macro_export]
 macro_rules! SBYTE {
     ($($values: expr),+) => {
-        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::SBYTE($values)),+])
+        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::SBYTE($values)),+])
     };
 }
 
@@ -365,7 +365,7 @@ impl TiffType for UNDEFINED {
 #[macro_export]
 macro_rules! UNDEFINED {
     ($($values: expr),+) => {
-        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::UNDEFINED($values)),+])
+        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::UNDEFINED($values)),+])
     };
 }
 
@@ -404,7 +404,7 @@ impl TiffType for SSHORT {
 #[macro_export]
 macro_rules! SSHORT {
     ($($values: expr),+) => {
-        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::SSHORT($values)),+])
+        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::SSHORT($values)),+])
     };
 }
 
@@ -443,7 +443,7 @@ impl TiffType for SLONG {
 #[macro_export]
 macro_rules! SLONG {
     ($($values: expr),+) => {
-        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::SLONG($values)),+])
+        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::SLONG($values)),+])
     };
 }
 
@@ -500,7 +500,7 @@ impl TiffType for SRATIONAL {
 #[macro_export]
 macro_rules! SRATIONAL {
     ($(($num: expr, $den: expr)),+) => {
-        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::SRATIONAL{numerator: $num, denominator: $den}),+])
+        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::SRATIONAL{numerator: $num, denominator: $den}),+])
     };
 }
 
@@ -539,7 +539,7 @@ impl TiffType for FLOAT {
 #[macro_export]
 macro_rules! FLOAT {
     ($($values: expr),+) => {
-        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::FLOAT($values)),+])
+        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::FLOAT($values)),+])
     };
 }
 
@@ -577,7 +577,7 @@ impl TiffType for DOUBLE {
 #[macro_export]
 macro_rules! DOUBLE {
     ($($values: expr),+) => {
-        ::tiff_encoder::TiffTypeValues::new(vec![$(::tiff_encoder::tiff_type::DOUBLE($values)),+])
+        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::DOUBLE($values)),+])
     };
 }
 
