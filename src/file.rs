@@ -25,16 +25,20 @@ impl TiffFile {
     ///
     /// Creating the simplest valid `TiffFile`: a single [`Ifd`] with only one entry.
     /// ```
-    /// use tiff_encoder::*;
-    /// use tiff_encoder::tiff_type::*;
+    /// #[macro_use]
+    /// extern crate tiff_encoder;
+    /// use tiff_encoder::prelude::*;
+    ///
+    /// # fn main() {
     /// let tiff_file = TiffFile::new(
     ///     Ifd::new()
     ///         .with_entry(0x0000, BYTE![0])
     ///         .single()
     /// );
+    /// # }
     /// ```
-    /// [`Ifd`]: struct.Ifd.html
-    /// [`IfdChain`]: struct.IfdChain.html
+    /// [`Ifd`]: ifd/struct.Ifd.html
+    /// [`IfdChain`]: ifd/struct.IfdChain.html
     /// [`with_endianness`]: #method.with_endianness
     pub fn new(ifds: IfdChain) -> TiffFile {
         TiffFile {
@@ -54,14 +58,18 @@ impl TiffFile {
     /// As this method returns `Self`, it can be chained when
     /// building a `TiffFile`.
     /// ```
-    /// use tiff_encoder::*;
-    /// use tiff_encoder::tiff_type::*;
+    /// #[macro_use]
+    /// extern crate tiff_encoder;
+    /// use tiff_encoder::prelude::*;
+    /// use tiff_encoder::write;
     ///
+    /// # fn main() {
     /// let tiff_file = TiffFile::new(
     ///     Ifd::new()
     ///         .with_entry(0x0000, BYTE![0])
     ///         .single()
     /// ).with_endianness(write::Endianness::MM);
+    /// # }
     /// ```
     pub fn with_endianness(mut self, endian: Endianness) -> Self {
         self.header.byte_order = endian;
@@ -77,14 +85,17 @@ impl TiffFile {
     ///
     /// Note that, in this example, `file` is a `fs::File`, not a `TiffFile`.
     /// ```
-    /// use tiff_encoder::*;
-    /// use tiff_encoder::tiff_type::*;
+    /// #[macro_use]
+    /// extern crate tiff_encoder;
+    /// use tiff_encoder::prelude::*;
     ///
+    /// # fn main() {
     /// let file = TiffFile::new(
     ///     Ifd::new()
     ///         .with_entry(0x0000, BYTE![0])
     ///         .single()
     /// ).write_to("file.tif").unwrap();
+    /// # }
     /// ```
     ///
     /// # Errors

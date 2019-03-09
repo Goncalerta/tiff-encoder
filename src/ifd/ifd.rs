@@ -91,7 +91,7 @@ impl AllocatedIfdChain {
 /// parameters actually ask for an `IfdChain`.
 ///
 /// One can easily create an `IfdChain` of a single `Ifd` calling the
-/// method [`single()`] on that Ifd.
+/// method [`single()`] on that `Ifd`.
 ///
 /// [`IfdChain`]: struct.IfdChain.html
 /// [`single()`]: #method.single
@@ -128,15 +128,18 @@ impl Ifd {
     /// specified by the TIFF specification.
     ///
     /// ```
-    /// use tiff_encoder::*;
-    /// use tiff_encoder::tiff_type::*;
+    /// #[macro_use]
+    /// extern crate tiff_encoder;
+    /// use tiff_encoder::prelude::*;
     ///
+    /// # fn main() {
     /// let ifd = Ifd::new()
     ///     .with_entry(0x0000, BYTE![0])
     ///     .with_entry(0x00FF, LONG![500])
     ///     .with_entry(0xA01F, SHORT![50, 2, 0, 3])
     ///     .with_entry(0x0005, ASCII!["Hello TIFF!"])
     ///     .with_entry(0x0100, UNDEFINED![0x42, 0x42, 0x42, 0x42]);
+    /// # }
     /// ```
     ///
     /// # Panics
@@ -148,7 +151,7 @@ impl Ifd {
     /// Other functions that insert members to the `Ifd` will have an "Entries"
     /// section, where they'll specify which entries are inserted.
     ///
-    /// [`TiffFile`]: struct.TiffFile.html
+    /// [`TiffFile`]: ../struct.TiffFile.html
     pub fn with_entry<T: FieldValues + 'static>(mut self, tag: FieldTag, value: T) -> Self {
         if self.entries.insert(tag, Box::new(value)).is_some() {
             panic!("Tried to add the same tag twice.");
@@ -168,7 +171,7 @@ impl Ifd {
     ///
     /// If the inserted entries already exist, this function will `panic`.
     ///
-    /// [`TiffFile`]: struct.TiffFile.html
+    /// [`TiffFile`]: ../struct.TiffFile.html
     pub fn with_subifds(self, subifds: Vec<IfdChain>) -> Self {
         self.with_entry(tags::SubIFDs, OffsetsToIfds::new(subifds))
     }

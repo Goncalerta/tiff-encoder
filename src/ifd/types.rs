@@ -16,9 +16,8 @@ use crate::write::EndianFile;
 
 /// A type of data for TIFF fields.
 ///
-/// Other types that might come to exist (and aren't supported by
-/// this crate yet) can be easily implemented by implementing this
-/// trait.
+/// Other types that might come to exist can be easily implemented by
+/// implementing this trait.
 pub trait TiffType {
     /// The TIFF 16-bit code that identifies the type.
     fn id() -> u16;
@@ -33,7 +32,7 @@ pub trait TiffType {
     /// Will `panic` if the number of bytes written to the file is
     /// different than the number of bytes specified in [`size()`].
     ///
-    /// [`EndianFile`]: ../struct.EndianFile.html
+    /// [`EndianFile`]: ../../struct.EndianFile.html
     /// [`size()`]: #tymethod.size
     fn write_to(self, file: &mut EndianFile) -> io::Result<()>;
 }
@@ -44,7 +43,7 @@ impl BYTE {
     /// Constructs a [`TiffTypeValues`] of `BYTE`s from a vector of
     /// bytes.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn values<T: AsRef<[u8]>>(values: T) -> TiffTypeValues<BYTE> {
         TiffTypeValues::new(values.as_ref().iter().map(|&value| BYTE(value)).collect())
     }
@@ -53,7 +52,7 @@ impl BYTE {
     /// In other words, marks this `BYTE` as the single value of its
     /// field.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn single(value: u8) -> TiffTypeValues<BYTE> {
         TiffTypeValues::new(vec![BYTE(value)])
     }
@@ -69,6 +68,9 @@ impl TiffType for BYTE {
         file.write_u8(self.0)
     }
 }
+/// Convenient macro to declare an IFD entry of [`BYTE`] values.
+///
+/// [`BYTE`]: ifd/types/struct.BYTE.html
 #[macro_export]
 macro_rules! BYTE {
     ($($values: expr),+) => {
@@ -87,7 +89,7 @@ impl ASCII {
     /// If the string doesn't already end with a `NUL` value, it will
     /// be added automatically.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn from_str(s: &str) -> TiffTypeValues<ASCII> {
         let mut values = Vec::with_capacity(s.chars().count());
         for c in s.chars() {
@@ -104,7 +106,7 @@ impl ASCII {
     /// If last value isn't already a `NUL` value, a `NUL` value will
     /// be added automatically after the last value.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn values<T: AsRef<[u8]>>(values: T) -> TiffTypeValues<ASCII> {
         let values = values.as_ref();
         if values.len() == 0 {
@@ -144,7 +146,9 @@ impl TiffType for ASCII {
         file.write_u8(self.0)
     }
 }
-// Only for consistency; does the same as ASCII::from_str
+/// Convenient macro to declare an IFD entry of [`ASCII`] values.
+///
+/// [`ASCII`]: ifd/types/struct.ASCII.html
 #[macro_export]
 macro_rules! ASCII {
     ($string: expr) => {
@@ -158,7 +162,7 @@ impl SHORT {
     /// Constructs a [`TiffTypeValues`] of `SHORTS`s from a vector of
     /// `u16`.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn values<T: AsRef<[u16]>>(values: T) -> TiffTypeValues<SHORT> {
         TiffTypeValues::new(values.as_ref().iter().map(|&value| SHORT(value)).collect())
     }
@@ -168,7 +172,7 @@ impl SHORT {
     /// In other words, marks this `SHORT` as the single value of its
     /// field.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn single(value: u16) -> TiffTypeValues<SHORT> {
         TiffTypeValues::new(vec![SHORT(value)])
     }
@@ -184,6 +188,9 @@ impl TiffType for SHORT {
         file.write_u16(self.0)
     }
 }
+/// Convenient macro to declare an IFD entry of [`SHORT`] values.
+///
+/// [`SHORT`]: ifd/types/struct.SHORT.html
 #[macro_export]
 macro_rules! SHORT {
     ($($values: expr),+) => {
@@ -197,7 +204,7 @@ impl LONG {
     /// Constructs a [`TiffTypeValues`] of `LONG`s from a vector of
     /// `u32`.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn values<T: AsRef<[u32]>>(values: T) -> TiffTypeValues<LONG> {
         TiffTypeValues::new(values.as_ref().iter().map(|&value| LONG(value)).collect())
     }
@@ -207,7 +214,7 @@ impl LONG {
     /// In other words, marks this `LONG` as the single value of its
     /// field.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn single(value: u32) -> TiffTypeValues<LONG> {
         TiffTypeValues::new(vec![LONG(value)])
     }
@@ -223,6 +230,9 @@ impl TiffType for LONG {
         file.write_u32(self.0)
     }
 }
+/// Convenient macro to declare an IFD entry of [`LONG`] values.
+///
+/// [`LONG`]: ifd/types/struct.BYTE.html
 #[macro_export]
 macro_rules! LONG {
     ($($values: expr),+) => {
@@ -239,7 +249,7 @@ impl RATIONAL {
     /// Constructs a [`TiffTypeValues`] of `RATIONAL`s from a vector of
     /// pairs (numerator, denominator). Both must be `u32` values.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn values<T: AsRef<[(u32, u32)]>>(values: T) -> TiffTypeValues<RATIONAL> {
         TiffTypeValues::new(
             values
@@ -259,7 +269,7 @@ impl RATIONAL {
     /// In other words, marks this `RATIONAL` as the single value of its
     /// field.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn single(numerator: u32, denominator: u32) -> TiffTypeValues<RATIONAL> {
         TiffTypeValues::new(vec![RATIONAL {
             numerator,
@@ -280,6 +290,9 @@ impl TiffType for RATIONAL {
         Ok(())
     }
 }
+/// Convenient macro to declare an IFD entry of [`RATIONAL`] values.
+///
+/// [`RATIONAL`]: ifd/types/struct.RATIONAL.html
 #[macro_export]
 macro_rules! RATIONAL {
     ($(($num: expr, $den: expr)),+) => {
@@ -293,7 +306,7 @@ impl SBYTE {
     /// Constructs a [`TiffTypeValues`] of `SBYTE`s from a vector of
     /// `i8`.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn values<T: AsRef<[i8]>>(values: T) -> TiffTypeValues<SBYTE> {
         TiffTypeValues::new(values.as_ref().iter().map(|&value| SBYTE(value)).collect())
     }
@@ -302,7 +315,7 @@ impl SBYTE {
     /// In other words, marks this `SBYTE` as the single value of its
     /// field.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn single(value: i8) -> TiffTypeValues<SBYTE> {
         TiffTypeValues::new(vec![SBYTE(value)])
     }
@@ -318,6 +331,9 @@ impl TiffType for SBYTE {
         file.write_i8(self.0)
     }
 }
+/// Convenient macro to declare an IFD entry of [`SBYTE`] values.
+///
+/// [`SBYTE`]: ifd/types/struct.SBYTE.html
 #[macro_export]
 macro_rules! SBYTE {
     ($($values: expr),+) => {
@@ -331,7 +347,7 @@ impl UNDEFINED {
     /// Constructs a [`TiffTypeValues`] of `UNDEFINED`s from a vector of
     /// bytes.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn values<T: AsRef<[u8]>>(values: T) -> TiffTypeValues<UNDEFINED> {
         TiffTypeValues::new(
             values
@@ -346,7 +362,7 @@ impl UNDEFINED {
     /// In other words, marks this `UNDEFINED` as the single value of its
     /// field.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn single(value: u8) -> TiffTypeValues<UNDEFINED> {
         TiffTypeValues::new(vec![UNDEFINED(value)])
     }
@@ -362,6 +378,9 @@ impl TiffType for UNDEFINED {
         file.write_u8(self.0)
     }
 }
+/// Convenient macro to declare an IFD entry of [`UNDEFINED`] values.
+///
+/// [`UNDEFINED`]: ifd/types/struct.UNDEFINED.html
 #[macro_export]
 macro_rules! UNDEFINED {
     ($($values: expr),+) => {
@@ -375,7 +394,7 @@ impl SSHORT {
     /// Constructs a [`TiffTypeValues`] of `SSHORT`s from a vector of
     /// `i16`.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn values<T: AsRef<[i16]>>(values: T) -> TiffTypeValues<SSHORT> {
         TiffTypeValues::new(values.as_ref().iter().map(|&value| SSHORT(value)).collect())
     }
@@ -385,7 +404,7 @@ impl SSHORT {
     /// In other words, marks this `SSHORT` as the single value of its
     /// field.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn single(value: i16) -> TiffTypeValues<SSHORT> {
         TiffTypeValues::new(vec![SSHORT(value)])
     }
@@ -401,6 +420,9 @@ impl TiffType for SSHORT {
         file.write_i16(self.0)
     }
 }
+/// Convenient macro to declare an IFD entry of [`SSHORT`] values.
+///
+/// [`SSHORT`]: ifd/types/struct.SSHORT.html
 #[macro_export]
 macro_rules! SSHORT {
     ($($values: expr),+) => {
@@ -414,7 +436,7 @@ impl SLONG {
     /// Constructs a [`TiffTypeValues`] of `SLONG`s from a vector of
     /// `i32`.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn values<T: AsRef<[i32]>>(values: T) -> TiffTypeValues<SLONG> {
         TiffTypeValues::new(values.as_ref().iter().map(|&value| SLONG(value)).collect())
     }
@@ -424,7 +446,7 @@ impl SLONG {
     /// In other words, marks this `SLONG` as the single value of its
     /// field.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn single(value: i32) -> TiffTypeValues<SLONG> {
         TiffTypeValues::new(vec![SLONG(value)])
     }
@@ -440,6 +462,9 @@ impl TiffType for SLONG {
         file.write_i32(self.0)
     }
 }
+/// Convenient macro to declare an IFD entry of [`SLONG`] values.
+///
+/// [`SLONG`]: ifd/types/struct.SLONG.html
 #[macro_export]
 macro_rules! SLONG {
     ($($values: expr),+) => {
@@ -456,7 +481,7 @@ impl SRATIONAL {
     /// Constructs a [`TiffTypeValues`] of `SRATIONAL`s from a vector of
     /// pairs (numerator, denominator). Both must be `i32` values.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn values<T: AsRef<[(i32, i32)]>>(values: T) -> TiffTypeValues<SRATIONAL> {
         TiffTypeValues::new(
             values
@@ -476,7 +501,7 @@ impl SRATIONAL {
     /// In other words, marks this `SRATIONAL` as the single value of its
     /// field.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn single(numerator: i32, denominator: i32) -> TiffTypeValues<SRATIONAL> {
         TiffTypeValues::new(vec![SRATIONAL {
             numerator,
@@ -497,6 +522,9 @@ impl TiffType for SRATIONAL {
         Ok(())
     }
 }
+/// Convenient macro to declare an IFD entry of [`SRATIONAL`] values.
+///
+/// [`SRATIONAL`]: ifd/types/struct.SRATIONAL.html
 #[macro_export]
 macro_rules! SRATIONAL {
     ($(($num: expr, $den: expr)),+) => {
@@ -510,7 +538,7 @@ impl FLOAT {
     /// Constructs a [`TiffTypeValues`] of `FLOAT`s from a vector of
     /// `f32`.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn values<T: AsRef<[f32]>>(values: T) -> TiffTypeValues<FLOAT> {
         TiffTypeValues::new(values.as_ref().iter().map(|&value| FLOAT(value)).collect())
     }
@@ -520,7 +548,7 @@ impl FLOAT {
     /// In other words, marks this `FLOAT` as the single value of its
     /// field.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn single(value: f32) -> TiffTypeValues<FLOAT> {
         TiffTypeValues::new(vec![FLOAT(value)])
     }
@@ -536,6 +564,9 @@ impl TiffType for FLOAT {
         file.write_f32(self.0)
     }
 }
+/// Convenient macro to declare an IFD entry of [`FLOAT`] values.
+///
+/// [`FLOAT`]: ifd/types/struct.FLOAT.html
 #[macro_export]
 macro_rules! FLOAT {
     ($($values: expr),+) => {
@@ -549,7 +580,7 @@ impl DOUBLE {
     /// Constructs a [`TiffTypeValues`] of `DOUBLE`s from a vector of
     /// `f64`.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn values<T: AsRef<[f64]>>(values: T) -> TiffTypeValues<DOUBLE> {
         TiffTypeValues::new(values.as_ref().iter().map(|&value| DOUBLE(value)).collect())
     }
@@ -558,7 +589,7 @@ impl DOUBLE {
     /// In other words, marks this `DOUBLE` as the single value of its
     /// field.
     ///
-    /// [`TiffTypeValues`]: ../struct.TiffTypeValues.html
+    /// [`TiffTypeValues`]: ../values/struct.TiffTypeValues.html
     pub fn single(value: f64) -> TiffTypeValues<DOUBLE> {
         TiffTypeValues::new(vec![DOUBLE(value)])
     }
@@ -574,6 +605,9 @@ impl TiffType for DOUBLE {
         file.write_f64(self.0)
     }
 }
+/// Convenient macro to declare an IFD entry of [`DOUBLE`] values.
+///
+/// [`DOUBLE`]: ifd/types/struct.DOUBLE.html
 #[macro_export]
 macro_rules! DOUBLE {
     ($($values: expr),+) => {
@@ -585,7 +619,7 @@ macro_rules! DOUBLE {
 ///
 /// This type is not supposed to be used directly. See [`OffsetsToIfds`].
 ///
-/// [`OffsetsToIfds`]: ../struct.OffsetsToIfds.html
+/// [`OffsetsToIfds`]: ../values/struct.OffsetsToIfds.html
 pub struct IFD(pub(crate) u32);
 impl TiffType for IFD {
     fn id() -> u16 {

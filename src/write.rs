@@ -289,7 +289,9 @@ impl EndianFile {
 /// Creating a DataBlock for `Vec<u32>`:
 /// ```
 /// use std::io;
-/// use tiff_encoder::*;
+/// use tiff_encoder::write::{Datablock, EndianFile};
+/// use tiff_encoder::ifd::values::Offsets;
+///
 /// // Create a block that wraps the u32 data.
 /// struct U32Block(Vec<u32>);
 /// // Implement datablock functions
@@ -298,7 +300,7 @@ impl EndianFile {
 ///         // Each u32 occupies 4 bytes.
 ///         self.0.len() as u32 * 4
 ///     }
-///     fn write_to(self, file: &mut write::EndianFile) -> io::Result<()> {
+///     fn write_to(self, file: &mut EndianFile) -> io::Result<()> {
 ///         for val in self.0 {
 ///             file.write_u32(val)?
 ///         }
@@ -370,7 +372,7 @@ pub trait Datablock {
 ///
 /// Creating a ByteBlock from a `Vec<u8>`:
 /// ```
-/// use tiff_encoder::*;
+/// use tiff_encoder::prelude::*;
 ///
 /// // A vector holding arbitrary u8 data.
 /// // This is the data we want to store as a Byteblock.
@@ -382,11 +384,11 @@ pub trait Datablock {
 /// ```
 ///
 /// Creating a ByteBlock from a `Vec<u32>`:
-/// ``` extern crate byteorder;
+/// ```
+/// extern crate byteorder;
 /// // Crate byteorder will be used to write 32-bit information in a 8-bit buffer.
-/// use byteorder::io::WriteBytesExt;
-///
-/// use tiff_encoder::*;
+/// use byteorder::{LittleEndian, WriteBytesExt};
+/// use tiff_encoder::prelude::*;
 ///
 ///
 /// // A vector holding arbitrary u32 data.
@@ -416,7 +418,7 @@ impl ByteBlock {
     ///
     /// Each vector of bytes represents one `ByteBlock`.
     ///
-    /// [`Offsets`]: struct.Offsets.html
+    /// [`Offsets`]: ifd/values/struct.Offsets.html
     pub fn offsets(blocks: Vec<Vec<u8>>) -> Offsets<ByteBlock> {
         Offsets::new(blocks.into_iter().map(|block| ByteBlock(block)).collect())
     }
@@ -425,7 +427,7 @@ impl ByteBlock {
     ///
     /// This vector of bytes represents a single `ByteBlock`.
     ///
-    /// [`Offsets`]: struct.Offsets.html
+    /// [`Offsets`]: ifd/values/struct.Offsets.html
     pub fn single(block: Vec<u8>) -> Offsets<ByteBlock> {
         ByteBlock::offsets(vec![block])
     }

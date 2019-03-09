@@ -1,3 +1,21 @@
+//! The values contained or pointed at by an IFD Field.
+//!
+//! There are three groups of [`FieldValues`]: [`TiffTypeValues`],
+//! [`Offsets`] and [`OffsetsToIfds`]. The first represents a list
+//! of values of any given [`TiffType`]. The second represents a
+//! list of [`LONG`] values, each pointing to a specific [`Datablock`].
+//! The third represents a list of [`IFD`] values, each pointing to
+//! an [`Ifd`].
+//!
+//! [`FieldValues`]: trait.FieldValues.html
+//! [`TiffTypeValues`]: struct.TiffTypeValues.html
+//! [`Offsets`]: struct.Offsets.html
+//! [`OffsetsToIfds`]: struct.OffsetsToIfds.html
+//! [`TiffType`]: ../types/trait.TiffType.html
+//! [`LONG`]: ../types/struct.LONG.html
+//! [`IFD`]: ../types/struct.IFD.html
+//! [`Datablock`]: ../../write/trait.Datablock.html
+
 use std::io;
 
 use crate::ifd::types::{TiffType, IFD, LONG};
@@ -19,10 +37,10 @@ use crate::write::{Cursor, Datablock, EndianFile};
 /// [`TiffTypeValues`]: struct.TiffTypeValues.html
 /// [`Offsets`]: struct.Offsets.html
 /// [`OffsetsToIfds`]: struct.OffsetsToIfds.html
-/// [`TiffType`]: tiff_type/trait.TiffType.html
-/// [`LONG`]:tiff_type/struct.LONG.html
-/// [`IFD`]:tiff_type/struct.IFD.html
-/// [`Datablock`]: trait.Datablock.html
+/// [`TiffType`]: ../types/trait.TiffType.html
+/// [`LONG`]: ../types/struct.LONG.html
+/// [`IFD`]: ../types/struct.IFD.html
+/// [`Datablock`]: ../../write/trait.Datablock.html
 pub trait FieldValues: private::Sealed {
     /// The number of values the field contains.
     #[doc(hidden)]
@@ -75,22 +93,22 @@ mod private {
 /// doesn't have to deal with the offsets in the file. It is responsible
 /// for writing both the offsets and the blocks of data.
 ///
-/// [`LONG`]:tiff_type/struct.LONG.html
-/// [`Datablock`]: trait.Datablock.html
+/// [`LONG`]: ../types/struct.LONG.html
+/// [`Datablock`]: ../../write/trait.Datablock.html
 pub struct Offsets<T: Datablock> {
     pub data: Vec<T>,
 }
 impl<T: Datablock + 'static> Offsets<T> {
     /// Creates a new `Offsets` instance from a vector of [`Datablock`]s.
     ///
-    /// [`Datablock`]: trait.Datablock.html
+    /// [`Datablock`]: ../../write/trait.Datablock.html
     pub fn new(datablocks: Vec<T>) -> Self {
         Offsets { data: datablocks }
     }
 
     /// Creates a new `Offsets` instance from a single [`Datablock`].
     ///
-    /// [`Datablock`]: trait.Datablock.html
+    /// [`Datablock`]: ../../write/trait.Datablock.html
     pub fn single(datablock: T) -> Self {
         Offsets::new(vec![datablock])
     }
@@ -205,7 +223,7 @@ impl<T: Datablock> AllocatedFieldValues for AllocatedOffsets<T> {
 
 /// A list of values of any given [`TiffType`].
 ///
-/// [`TiffType`]: tiff_type/trait.TiffType.html
+/// [`TiffType`]: ../types/trait.TiffType.html
 pub struct TiffTypeValues<T: TiffType> {
     values: Vec<T>,
 }
@@ -213,7 +231,7 @@ impl<T: TiffType + 'static> TiffTypeValues<T> {
     /// Creates a new instance of `TiffTypeValues` from a vector
     /// of instances of any given [`TiffType`].
     ///
-    /// [`TiffType`]: tiff_type/trait.TiffType.html
+    /// [`TiffType`]: ../types/trait.TiffType.html
     pub fn new(values: Vec<T>) -> Self {
         if values.len() == 0 {
             panic!("Cannot create an empty instance of TiffTypeValues")
@@ -306,17 +324,17 @@ impl<T: TiffType> AllocatedFieldValues for AllocatedTiffTypeValues<T> {
 ///
 /// It is responsible for writing both the offsets and all the [`Ifd`]s.
 ///
-/// [`LONG`]:tiff_type/struct.LONG.html
-/// [`IFD`]:tiff_type/struct.IFD.html
-/// [`Ifd`]: struct.Ifd.html
-/// [`IfdChain`]: struct.IfdChain.html
+/// [`LONG`]: ../types/struct.LONG.html
+/// [`IFD`]: ../types/struct.IFD.html
+/// [`Ifd`]: ../struct.Ifd.html
+/// [`IfdChain`]: ../struct.IfdChain.html
 pub struct OffsetsToIfds {
     pub data: Vec<IfdChain>,
 }
 impl OffsetsToIfds {
     /// Creates a new `OffsetsToIfds` instance from a vector of [`IfdChain`]s.
     ///
-    /// [`IfdChain`]: struct.IfdChain.html
+    /// [`IfdChain`]: ../struct.IfdChain.html
     pub fn new(ifds: Vec<IfdChain>) -> Self {
         OffsetsToIfds { data: ifds }
     }
