@@ -38,6 +38,7 @@ pub trait TiffType {
 }
 
 /// 8-bit unsigned integer.
+#[derive(Debug, PartialEq)]
 pub struct BYTE(pub u8);
 impl BYTE {
     /// Constructs a [`TiffTypeValues`] of `BYTE`s from a vector of
@@ -82,6 +83,7 @@ macro_rules! BYTE {
 ///
 /// According the TIFF specification, the last byte
 /// of a field of `ASCII`s must be `NUL` (binary zero, '\0').
+#[derive(Debug, PartialEq)]
 pub struct ASCII(u8);
 impl ASCII {
     /// Constructs a [`TiffTypeValues`] of `ASCII`s from a `&str`.
@@ -157,6 +159,7 @@ macro_rules! ASCII {
 }
 
 /// 16-bit (2-byte) unsigned integer.
+#[derive(Debug, PartialEq)]
 pub struct SHORT(pub u16);
 impl SHORT {
     /// Constructs a [`TiffTypeValues`] of `SHORTS`s from a vector of
@@ -199,6 +202,7 @@ macro_rules! SHORT {
 }
 
 /// 32-bit (4-byte) unsigned integer.
+#[derive(Debug, PartialEq)]
 pub struct LONG(pub u32);
 impl LONG {
     /// Constructs a [`TiffTypeValues`] of `LONG`s from a vector of
@@ -241,6 +245,7 @@ macro_rules! LONG {
 }
 
 /// Two LONGs representing, respectively, the numerator and the denominator of a fraction.
+#[derive(Debug, PartialEq)]
 pub struct RATIONAL {
     pub numerator: u32,
     pub denominator: u32,
@@ -301,6 +306,7 @@ macro_rules! RATIONAL {
 }
 
 /// 8-bit signed (twos-complement) integer.
+#[derive(Debug, PartialEq)]
 pub struct SBYTE(pub i8);
 impl SBYTE {
     /// Constructs a [`TiffTypeValues`] of `SBYTE`s from a vector of
@@ -342,6 +348,7 @@ macro_rules! SBYTE {
 }
 
 /// 8-bit byte that may contain anything, depending on the definition of the field.
+#[derive(Debug, PartialEq)]
 pub struct UNDEFINED(pub u8);
 impl UNDEFINED {
     /// Constructs a [`TiffTypeValues`] of `UNDEFINED`s from a vector of
@@ -389,6 +396,7 @@ macro_rules! UNDEFINED {
 }
 
 /// 16-bit (2-byte) signed (twos-complement) integer.
+#[derive(Debug, PartialEq)]
 pub struct SSHORT(pub i16);
 impl SSHORT {
     /// Constructs a [`TiffTypeValues`] of `SSHORT`s from a vector of
@@ -431,6 +439,7 @@ macro_rules! SSHORT {
 }
 
 /// 32-bit (4-byte) signed (twos-complement) integer.
+#[derive(Debug, PartialEq)]
 pub struct SLONG(pub i32);
 impl SLONG {
     /// Constructs a [`TiffTypeValues`] of `SLONG`s from a vector of
@@ -473,6 +482,7 @@ macro_rules! SLONG {
 }
 
 /// Two SLONGs representing, respectively, the numerator and the denominator of a fraction.
+#[derive(Debug, PartialEq)]
 pub struct SRATIONAL {
     pub numerator: i32,
     pub denominator: i32,
@@ -533,6 +543,7 @@ macro_rules! SRATIONAL {
 }
 
 /// Single precision (4-byte) IEEE format.
+#[derive(Debug, PartialEq)]
 pub struct FLOAT(pub f32);
 impl FLOAT {
     /// Constructs a [`TiffTypeValues`] of `FLOAT`s from a vector of
@@ -575,6 +586,7 @@ macro_rules! FLOAT {
 }
 
 /// Double precision (8-byte) IEEE format.
+#[derive(Debug, PartialEq)]
 pub struct DOUBLE(pub f64);
 impl DOUBLE {
     /// Constructs a [`TiffTypeValues`] of `DOUBLE`s from a vector of
@@ -620,6 +632,7 @@ macro_rules! DOUBLE {
 /// This type is not supposed to be used directly. See [`OffsetsToIfds`].
 ///
 /// [`OffsetsToIfds`]: ../values/struct.OffsetsToIfds.html
+#[derive(Debug, PartialEq)]
 pub struct IFD(pub(crate) u32);
 impl TiffType for IFD {
     fn id() -> u16 {
