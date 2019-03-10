@@ -74,7 +74,7 @@ impl TiffType for BYTE {
 #[macro_export]
 macro_rules! BYTE {
     ($($values: expr),+) => {
-        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::BYTE($values)),+])
+        $crate::ifd::values::TiffTypeValues::new(vec![$($crate::ifd::types::BYTE($values)),+])
     };
 }
 
@@ -152,7 +152,7 @@ impl TiffType for ASCII {
 #[macro_export]
 macro_rules! ASCII {
     ($string: expr) => {
-        ::tiff_encoder::ifd::types::ASCII::from_str($string)
+        $crate::ifd::types::ASCII::from_str($string)
     };
 }
 
@@ -194,7 +194,7 @@ impl TiffType for SHORT {
 #[macro_export]
 macro_rules! SHORT {
     ($($values: expr),+) => {
-        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::SHORT($values)),+])
+        $crate::ifd::values::TiffTypeValues::new(vec![$($crate::ifd::types::SHORT($values)),+])
     };
 }
 
@@ -236,7 +236,7 @@ impl TiffType for LONG {
 #[macro_export]
 macro_rules! LONG {
     ($($values: expr),+) => {
-        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::LONG($values)),+])
+        $crate::ifd::values::TiffTypeValues::new(vec![$($crate::ifd::types::LONG($values)),+])
     };
 }
 
@@ -296,7 +296,7 @@ impl TiffType for RATIONAL {
 #[macro_export]
 macro_rules! RATIONAL {
     ($(($num: expr, $den: expr)),+) => {
-        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::RATIONAL{numerator: $num, denominator: $den}),+])
+        $crate::ifd::values::TiffTypeValues::new(vec![$($crate::ifd::types::RATIONAL{numerator: $num, denominator: $den}),+])
     };
 }
 
@@ -337,7 +337,7 @@ impl TiffType for SBYTE {
 #[macro_export]
 macro_rules! SBYTE {
     ($($values: expr),+) => {
-        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::SBYTE($values)),+])
+        $crate::ifd::values::TiffTypeValues::new(vec![$($crate::ifd::types::SBYTE($values)),+])
     };
 }
 
@@ -384,7 +384,7 @@ impl TiffType for UNDEFINED {
 #[macro_export]
 macro_rules! UNDEFINED {
     ($($values: expr),+) => {
-        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::UNDEFINED($values)),+])
+        $crate::ifd::values::TiffTypeValues::new(vec![$($crate::ifd::types::UNDEFINED($values)),+])
     };
 }
 
@@ -426,7 +426,7 @@ impl TiffType for SSHORT {
 #[macro_export]
 macro_rules! SSHORT {
     ($($values: expr),+) => {
-        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::SSHORT($values)),+])
+        $crate::ifd::values::TiffTypeValues::new(vec![$($crate::ifd::types::SSHORT($values)),+])
     };
 }
 
@@ -468,7 +468,7 @@ impl TiffType for SLONG {
 #[macro_export]
 macro_rules! SLONG {
     ($($values: expr),+) => {
-        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::SLONG($values)),+])
+        $crate::ifd::values::TiffTypeValues::new(vec![$($crate::ifd::types::SLONG($values)),+])
     };
 }
 
@@ -528,7 +528,7 @@ impl TiffType for SRATIONAL {
 #[macro_export]
 macro_rules! SRATIONAL {
     ($(($num: expr, $den: expr)),+) => {
-        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::SRATIONAL{numerator: $num, denominator: $den}),+])
+        $crate::ifd::values::TiffTypeValues::new(vec![$($crate::ifd::types::SRATIONAL{numerator: $num, denominator: $den}),+])
     };
 }
 
@@ -570,7 +570,7 @@ impl TiffType for FLOAT {
 #[macro_export]
 macro_rules! FLOAT {
     ($($values: expr),+) => {
-        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::FLOAT($values)),+])
+        $crate::ifd::values::TiffTypeValues::new(vec![$($crate::ifd::types::FLOAT($values)),+])
     };
 }
 
@@ -611,7 +611,7 @@ impl TiffType for DOUBLE {
 #[macro_export]
 macro_rules! DOUBLE {
     ($($values: expr),+) => {
-        ::tiff_encoder::ifd::values::TiffTypeValues::new(vec![$(::tiff_encoder::ifd::types::DOUBLE($values)),+])
+        $crate::ifd::values::TiffTypeValues::new(vec![$($crate::ifd::types::DOUBLE($values)),+])
     };
 }
 
