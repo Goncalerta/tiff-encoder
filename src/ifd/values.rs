@@ -224,6 +224,7 @@ impl<T: Datablock> AllocatedFieldValues for AllocatedOffsets<T> {
 /// A list of values of any given [`TiffType`].
 ///
 /// [`TiffType`]: ../types/trait.TiffType.html
+#[derive(Debug, PartialEq)]
 pub struct TiffTypeValues<T: TiffType> {
     values: Vec<T>,
 }
