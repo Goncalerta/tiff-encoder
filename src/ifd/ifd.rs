@@ -159,6 +159,24 @@ impl Ifd {
         self
     }
 
+    /// Returns the same `Ifd`, after adding the specified pairs of Tags and Values.
+    ///
+    /// Because it returns `Self`, it is possible to chain this method.
+    ///
+    /// # Panics
+    ///
+    /// If the inserted entries already exist, this function will `panic`.
+    ///
+    pub fn with_entries<C: IntoIterator<Item=(FieldTag, Box<FieldValues>)>>(mut self, entries: C) -> Self {
+        entries.into_iter().for_each(|(tag, value)| {
+            if self.entries.insert(tag, value).is_some() {
+                panic!("Tried to add the same tag twice.");
+            }
+        });
+
+        self
+    }
+
     /// Returns the same `Ifd`, but adding the given subifds.
     ///
     /// Because it returns `Self`, it is possible to chain this method.
