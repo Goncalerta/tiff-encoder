@@ -11,7 +11,7 @@ the user needs to worry about the position of each structure in the
 file and to point to it with the correct offset.
 
 The main structure of this crate, used to actually write the TIFF
-file, is the [`TiffFile`]. This structure writes the file in [little endian]
+file, is the [`TiffFile`]. This structure writes the file in [Little Endian]
 by default (but that can be changed) and requires an [`IfdChain`]. This
 `IfdChain` consists of the first [`Ifd`] of the file, the one it points to (if any),
 and so on. Each `Ifd` has one or more entries, which are represented
@@ -19,6 +19,7 @@ by a pair of [`FieldTag`] and [`FieldValues`].
 
 [TIFF]: https://en.wikipedia.org/wiki/TIFF
 [`TiffFile`]: https://docs.rs/tiff-encoder/0/tiff_encoder/struct.TiffFile.html
+[Little Endian]: https://en.wikipedia.org/wiki/Endianness#Little-endian
 [`IfdChain`]: https://docs.rs/tiff-encoder/0/tiff_encoder/ifd/struct.IfdChain.html
 [`Ifd`]: https://docs.rs/tiff-encoder/0/tiff_encoder/ifd/struct.Ifd.html
 [`FieldTag`]: https://docs.rs/tiff-encoder/0/tiff_encoder/ifd/tags/type.FieldTag.html
